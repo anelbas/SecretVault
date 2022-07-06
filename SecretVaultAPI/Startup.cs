@@ -11,6 +11,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using SecretVaultAPI.Model;
+using Microsoft.EntityFrameworkCore;
 
 namespace SecretVaultAPI
 {
@@ -32,6 +34,15 @@ namespace SecretVaultAPI
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "SecretVaultAPI", Version = "v1" });
             });
+
+            services.AddDbContext<SecretVaultDBContext>(options =>
+options.UseSqlServer(Configuration.GetConnectionString("DBConnection")));
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
+            });
+
+            services.AddControllersWithViews();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
