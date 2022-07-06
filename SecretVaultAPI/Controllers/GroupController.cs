@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SecretVaultAPI.Model;
 using System.Linq;
 using SecretVaultAPI.DTOs;
+using System;
 
 namespace SecretVaultAPI.Controllers
 {
@@ -68,11 +69,20 @@ namespace SecretVaultAPI.Controllers
 
             Group newGroup = new Group();
 
-            newGroup.CreatedBy = request._createdBy;
+            newGroup.GroupId = groupToEdit.GroupId;
+            newGroup.CreatedBy = (int)request._createdBy;
             newGroup.GroupName = request._groupName;
 
-            _context.Entry(groupToEdit).CurrentValues.SetValues(newGroup);
-            _context.SaveChanges();
+            try
+            {
+                _context.Update(newGroup);
+                _context.SaveChanges();
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e);
+            }
+
             
 
             return Ok(newGroup);
@@ -101,11 +111,18 @@ namespace SecretVaultAPI.Controllers
                 return NotFound();
             }
 
-            groupToEdit.CreatedBy = request._createdBy;
+            groupToEdit.CreatedBy = (int)request._createdBy;
             groupToEdit.GroupName = request._groupName;
 
-            _context.Groups.Update(groupToEdit);
-            _context.SaveChanges();
+            try
+            {
+                _context.Groups.Update(groupToEdit);
+                _context.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
 
 
             return Ok(groupToEdit);
@@ -121,8 +138,15 @@ namespace SecretVaultAPI.Controllers
 
             Group groupToDelete = _context.Groups.Find(id);
 
-            _context.Groups.Remove(groupToDelete);
-            _context.SaveChanges();
+            try
+            {
+                _context.Groups.Remove(groupToDelete);
+                _context.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
 
 
             return Ok(groupToDelete);

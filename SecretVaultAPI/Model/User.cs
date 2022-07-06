@@ -16,6 +16,7 @@ namespace SecretVaultAPI.Model
 
         public int UserId { get; set; }
         public string Email { get; set; }
+        public string Username { get; set; }
 
         public virtual ICollection<GroupUser> GroupUsers { get; set; }
         public virtual ICollection<Group> Groups { get; set; }
