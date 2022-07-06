@@ -1,87 +1,119 @@
-﻿//using Microsoft.AspNetCore.Http;
-//using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using SecretVaultAPI.DTOs;
+using SecretVaultAPI.Model;
+using System.Linq;
 
-//namespace SecretVaultAPI.Controllers
-//{
-//    [ApiController]
-//    [Route("[controller]")]
-//    public class PostsController : Controller
-//    {
-//        // GET: Posts
-//        public ActionResult Index()
-//        {
-//            return View();
-//        }
+namespace SecretVaultAPI.Controllers
+{
+  [ApiController]
+  [Route("[controller]")]
+  public class PostsController : Controller
+  {
 
-//        // GET: Posts/Details/5
-//        [HttpGet]
-//        public ActionResult Details(int id)
-//        {
-//            return View();
-//        }
+    public SecretVaultDBContext _context = new SecretVaultDBContext();
 
-//        // GET: Posts/Create
-//        [HttpPost("post/{id}")]
-//        public ActionResult Create()
-//        {
-//            return View();
-//        }
+    [HttpGet("post")]
+    public IActionResult DetailsForAllPosts()
+    {
+      return Ok(_context.Posts.ToList());
+    }
 
-//        // POST: Posts/Create
-//        [HttpPost]
-//        [ValidateAntiForgeryToken]
-//        public ActionResult Create(IFormCollection collection)
-//        {
-//            try
-//            {
-//                return RedirectToAction(nameof(Index));
-//            }
-//            catch
-//            {
-//                return View();
-//            }
-//        }
+    // GET: Posts/Details/5
+    [HttpGet("post/{id}")]
+    public IActionResult Details(int? id)
+    {
+      if (id == null)
+      {
+        return BadRequest();
+      }
 
-//        // GET: Posts/Edit/5
-//        public ActionResult Edit(int id)
-//        {
-//            return View();
-//        }
+      Post postToReturn = _context.Posts.Find(id);
+      if (postToReturn == null)
+      {
+        return NotFound();
+      }
 
-//        // POST: Posts/Edit/5
-//        [HttpPost]
-//        [ValidateAntiForgeryToken]
-//        public ActionResult Edit(int id, IFormCollection collection)
-//        {
-//            try
-//            {
-//                return RedirectToAction(nameof(Index));
-//            }
-//            catch
-//            {
-//                return View();
-//            }
-//        }
+      return Ok(postToReturn);
+    }
 
-//        // GET: Posts/Delete/5
-//        public ActionResult Delete(int id)
-//        {
-//            return View();
-//        }
+    // GET: Posts/Create
+    [HttpPost("post")]
+    public IActionResult Create([FromBody] PostDTO request)
+    {
 
-//        // POST: Posts/Delete/5
-//        [HttpPost]
-//        [ValidateAntiForgeryToken]
-//        public ActionResult Delete(int id, IFormCollection collection)
-//        {
-//            try
-//            {
-//                return RedirectToAction(nameof(Index));
-//            }
-//            catch
-//            {
-//                return View();
-//            }
-//        }
-//    }
-//}
+      bool validRequest = request != null;
+      validRequest |= (request._title != null);
+      validRequest |= (request._content != null);
+      validRequest |= (request._timestamp != null);
+      validRequest |= (request._privacyStatusId != null);
+      validRequest |= (request._userId != null);
+
+      if (!validRequest)
+      {
+        return BadRequest();
+      }
+
+      Post newPost = new Post();
+
+      newPost.Title = request._title;
+      newPost.Content = request._content;
+      newPost.Timestamp = request._timestamp;
+      newPost.PrivacyStatusId = request._privacyStatusId;
+      newPost.UserId = request._userId;
+
+      _context.Add(newPost);
+      _context.SaveChanges();
+
+      return Ok(newPost);
+    }
+
+    [HttpPut("post/{id}")]
+    public IActionResult EditPut(int? id, [FromBody] PostDTO request)
+    {
+      if (id == null)
+      {
+        return BadRequest();
+      }
+
+      bool validRequest = request != null;
+      validRequest |= (request._title != null);
+      validRequest |= (request._content != null);
+      validRequest |= (request._timestamp != null);
+      validRequest |= (request._privacyStatusId != null);
+      validRequest |= (request._userId != null);
+
+      if (!validRequest)
+      {
+        return BadRequest();
+      }
+
+      Post postToEdit = _context.Posts.Find(id);
+      if (postToEdit == null)
+      {
+        return NotFound();
+      }
+
+
+      Post newPost = new Post();
+
+      newPost.Title = request._title;
+      newPost.Content = request._content;
+      newPost.Timestamp = request._timestamp;
+      newPost.PrivacyStatusId = request._privacyStatusId;
+      newPost.UserId = request._userId;
+
+
+      _context.Entry(postToEdit).CurrentValues.SetValues(newPost);
+      _context.SaveChanges();
+
+
+      return Ok(newPost);
+    }
+
+
+
+
+
+  }
+}
