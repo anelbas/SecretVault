@@ -35,7 +35,7 @@ namespace SecretVaultAPI.Model
                     .SetBasePath(Directory.GetCurrentDirectory())
                     .AddJsonFile("appsettings.json")
                     .Build();
-                string myDbConnection = _configuration.GetConnectionString("DBConnection");
+                string myDbConnection = _configuration.GetConnectionString("DefaultConnection");
                 optionsBuilder.UseSqlServer(myDbConnection);
             }
         }

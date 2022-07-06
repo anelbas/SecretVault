@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SecretVaultAPI.Model;
+using System.Linq;
+using SecretVaultAPI.DTOs;
 
 namespace SecretVaultAPI.Controllers
 {
@@ -7,81 +10,122 @@ namespace SecretVaultAPI.Controllers
     [Route("[controller]")]
     public class GroupController : Controller
     {
-        // GET: Group
-        
-        public ActionResult Index()
+
+        public SecretVaultDBContext _context = new SecretVaultDBContext();
+
+        [HttpGet("group/{id}")]
+        public IActionResult Details(int? id)
+        {
+            if (id == null)
+            {
+                return BadRequest();
+            }
+
+            Group groupToReturn = _context.Groups.Find(id);
+            if(groupToReturn == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(groupToReturn);
+        }
+
+        [HttpGet("group")]
+        public IActionResult DetailsForAllGroups()
+        {
+            return Ok(_context.Groups.ToList());
+        }
+
+        [HttpPost("/group")]
+        public IActionResult Create()
         {
             return View();
         }
 
-        // GET: Group/Details/5
-        [HttpGet]
-        public ActionResult Details(int id)
+        [HttpPut("group/{id}")]
+        public IActionResult EditPut(int? id, [FromBody] GroupDTO request)
         {
-            return View();
+            if(id == null)
+            {
+                return BadRequest();
+            }
+
+            bool validRequest = request != null;
+            validRequest |= (request._createdBy != null);
+            validRequest |= (request._groupName != null);
+
+            if (!validRequest)
+            {
+                return BadRequest();
+            }
+
+            Group groupToEdit = _context.Groups.Find(id);
+            if(groupToEdit == null)
+            {
+                return NotFound();
+            }
+
+
+            Group newGroup = new Group();
+
+            newGroup.CreatedBy = request._createdBy;
+            newGroup.GroupName = request._groupName;
+
+            _context.Entry(groupToEdit).CurrentValues.SetValues(newGroup);
+            _context.SaveChanges();
+            
+
+            return Ok(newGroup);
         }
 
-        // GET: Group/Create
-        public ActionResult Create()
+        [HttpPatch("group/{id}")]
+        public IActionResult EditPatch(int? id, [FromBody] GroupDTO request)
         {
-            return View();
+            if (id == null)
+            {
+                return BadRequest();
+            }
+
+            bool validRequest = request != null;
+            validRequest &= (request._createdBy != null);
+            validRequest &= (request._groupName != null);
+
+            if (!validRequest)
+            {
+                return BadRequest();
+            }
+
+            Group groupToEdit = _context.Groups.Find(id);
+            if (groupToEdit == null)
+            {
+                return NotFound();
+            }
+
+            groupToEdit.CreatedBy = request._createdBy;
+            groupToEdit.GroupName = request._groupName;
+
+            _context.Groups.Update(groupToEdit);
+            _context.SaveChanges();
+
+
+            return Ok(groupToEdit);
         }
 
-        // POST: Group/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        [HttpDelete("group/{id}")]
+        public IActionResult Delete(int? id)
         {
-            try
+            if (id == null)
             {
-                return RedirectToAction(nameof(Index));
+                return BadRequest();
             }
-            catch
-            {
-                return View();
-            }
-        }
 
-        // GET: Group/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
+            Group groupToDelete = _context.Groups.Find(id);
 
-        // POST: Group/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
+            _context.Groups.Remove(groupToDelete);
+            _context.SaveChanges();
 
-        // GET: Group/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
 
-        // POST: Group/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            return Ok(groupToDelete);
         }
     }
 }
