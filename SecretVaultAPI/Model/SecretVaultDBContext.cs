@@ -35,7 +35,7 @@ namespace SecretVaultAPI.Model
                     .SetBasePath(Directory.GetCurrentDirectory())
                     .AddJsonFile("appsettings.json")
                     .Build();
-                string myDbConnection = _configuration.GetConnectionString("DBConnection");
+                string myDbConnection = _configuration.GetConnectionString("DefaultConnection");
                 optionsBuilder.UseSqlServer(myDbConnection);
             }
         }
@@ -48,11 +48,15 @@ namespace SecretVaultAPI.Model
             {
                 entity.ToTable("Group");
 
-                entity.Property(e => e.GroupName).HasMaxLength(255);
+                entity.Property(e => e.GroupName)
+                    .IsRequired()
+                    .HasMaxLength(255)
+                    .IsUnicode(false);
 
                 entity.HasOne(d => d.CreatedByNavigation)
                     .WithMany(p => p.Groups)
                     .HasForeignKey(d => d.CreatedBy)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__Group__CreatedBy__4222D4EF");
             });
 
@@ -63,11 +67,13 @@ namespace SecretVaultAPI.Model
                 entity.HasOne(d => d.Group)
                     .WithMany(p => p.GroupUsers)
                     .HasForeignKey(d => d.GroupId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__GroupUser__Group__440B1D61");
 
                 entity.HasOne(d => d.Usr)
                     .WithMany(p => p.GroupUsers)
                     .HasForeignKey(d => d.UsrId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__GroupUser__UsrId__4316F928");
             });
 
@@ -75,21 +81,29 @@ namespace SecretVaultAPI.Model
             {
                 entity.ToTable("Post");
 
-                entity.Property(e => e.Content).HasMaxLength(255);
+                entity.Property(e => e.Content)
+                    .IsRequired()
+                    .IsUnicode(false)
+                    .UseCollation("Latin1_General_BIN2");
 
                 entity.Property(e => e.Timestamp).HasColumnType("datetime");
 
-                entity.Property(e => e.Title).HasMaxLength(255);
+                entity.Property(e => e.Title)
+                    .IsRequired()
+                    .HasMaxLength(255)
+                    .IsUnicode(false);
 
                 entity.HasOne(d => d.PrivacyStatus)
                     .WithMany(p => p.Posts)
                     .HasForeignKey(d => d.PrivacyStatusId)
-                    .HasConstraintName("FK__Post__PrivacySta__403A8C7D");
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__Post__PrivacySta__48CFD27E");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.Posts)
                     .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("FK__Post__UserId__412EB0B6");
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__Post__UserId__4AB81AF0");
             });
 
             modelBuilder.Entity<PostGroup>(entity =>
@@ -99,26 +113,39 @@ namespace SecretVaultAPI.Model
                 entity.HasOne(d => d.Group)
                     .WithMany(p => p.PostGroups)
                     .HasForeignKey(d => d.GroupId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__PostGroup__Group__45F365D3");
 
                 entity.HasOne(d => d.Post)
                     .WithMany(p => p.PostGroups)
                     .HasForeignKey(d => d.PostId)
-                    .HasConstraintName("FK__PostGroup__PostI__44FF419A");
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK__PostGroup__PostI__49C3F6B7");
             });
 
             modelBuilder.Entity<PrivacyStatus>(entity =>
             {
                 entity.ToTable("PrivacyStatus");
 
-                entity.Property(e => e.Status).HasMaxLength(255);
+                entity.Property(e => e.Status)
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<User>(entity =>
             {
                 entity.ToTable("User");
 
-                entity.Property(e => e.Email).HasMaxLength(255);
+                entity.Property(e => e.Email)
+                    .IsRequired()
+                    .HasMaxLength(255)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Username)
+                    .IsRequired()
+                    .HasMaxLength(255)
+                    .IsUnicode(false);
             });
 
             OnModelCreatingPartial(modelBuilder);

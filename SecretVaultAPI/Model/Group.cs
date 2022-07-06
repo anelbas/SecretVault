@@ -15,7 +15,7 @@ namespace SecretVaultAPI.Model
 
         public int GroupId { get; set; }
         public string GroupName { get; set; }
-        public int? CreatedBy { get; set; }
+        public int CreatedBy { get; set; }
 
         public virtual User CreatedByNavigation { get; set; }
         public virtual ICollection<GroupUser> GroupUsers { get; set; }
