@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SecretVaultAPI.DTOs;
 using SecretVaultAPI.Model;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace SecretVaultAPI.Controllers
@@ -16,7 +17,17 @@ namespace SecretVaultAPI.Controllers
     [HttpGet("post")]
     public IActionResult DetailsForAllPosts()
     {
-      return Ok(_context.Posts.ToList());
+
+      List<Post> posts = _context.Posts.ToList();
+      List<Post> newPosts = new List<Post>();
+      foreach (Post post in posts)
+      {
+        post.Content = Base64Decode(post.Content);
+
+        newPosts.Add(post);
+      }
+
+      return Ok(newPosts);
     }
 
     // GET: Posts/Details/5
