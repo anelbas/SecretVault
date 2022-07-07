@@ -69,34 +69,6 @@ namespace SecretVaultAPI.Controllers
             return Ok(newGroup);
         }
 
-        // [HttpPost("group")]
-        // public IActionResult AddUserToGroup([FromBody] GroupUserDTO request)
-        // {
-        //     bool validRequest = request != null;
-        //     validRequest |= (request._groupId != null);
-        //     validRequest |= (request._userId != null);
-
-        //     if (!validRequest)
-        //     {
-        //         return BadRequest();
-        //     }
-
-        //     Group newGroupUser = new Group();
-
-        //     try
-        //     {
-        //         _context.GroupUser.Add(newGroupUser);
-        //         _context.SaveChanges();
-        //     }
-        //     catch (Exception e)
-        //     {
-        //         Console.WriteLine(e);
-        //     }
-
-
-        //     return Ok(newGroupUser);
-        // }
-
         [HttpPut("group/{id}")]
         public IActionResult EditPut(int? id, [FromBody] GroupDTO request)
         {

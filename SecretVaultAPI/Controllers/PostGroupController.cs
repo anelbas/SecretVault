@@ -20,7 +20,7 @@ namespace SecretVaultAPI.Controllers
 
             bool validRequest = request != null;
             validRequest |= (request._groupId != null);
-            validRequest |= (request.PostId != null);
+            validRequest |= (request._postId != null);
 
             if (!validRequest)
             {
