@@ -1,87 +1,144 @@
-﻿//using Microsoft.AspNetCore.Http;
-//using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using SecretVaultAPI.DTOs;
+using SecretVaultAPI.Model;
+using System.Collections.Generic;
+using System.Linq;
 
-//namespace SecretVaultAPI.Controllers
-//{
-//    [ApiController]
-//    [Route("[controller]")]
-//    public class PostsController : Controller
-//    {
-//        // GET: Posts
-//        public ActionResult Index()
-//        {
-//            return View();
-//        }
+namespace SecretVaultAPI.Controllers
+{
+  [ApiController]
+  [Route("[controller]")]
+  public class PostsController : Controller
+  {
 
-//        // GET: Posts/Details/5
-//        [HttpGet]
-//        public ActionResult Details(int id)
-//        {
-//            return View();
-//        }
+    public SecretVaultDBContext _context = new SecretVaultDBContext();
 
-//        // GET: Posts/Create
-//        [HttpPost("post/{id}")]
-//        public ActionResult Create()
-//        {
-//            return View();
-//        }
+    [HttpGet("post")]
+    public IActionResult DetailsForAllPosts()
+    {
 
-//        // POST: Posts/Create
-//        [HttpPost]
-//        [ValidateAntiForgeryToken]
-//        public ActionResult Create(IFormCollection collection)
-//        {
-//            try
-//            {
-//                return RedirectToAction(nameof(Index));
-//            }
-//            catch
-//            {
-//                return View();
-//            }
-//        }
+      List<Post> posts = _context.Posts.ToList();
+      List<Post> newPosts = new List<Post>();
+      foreach (Post post in posts)
+      {
+        post.Content = Base64Decode(post.Content);
 
-//        // GET: Posts/Edit/5
-//        public ActionResult Edit(int id)
-//        {
-//            return View();
-//        }
+        newPosts.Add(post);
+      }
 
-//        // POST: Posts/Edit/5
-//        [HttpPost]
-//        [ValidateAntiForgeryToken]
-//        public ActionResult Edit(int id, IFormCollection collection)
-//        {
-//            try
-//            {
-//                return RedirectToAction(nameof(Index));
-//            }
-//            catch
-//            {
-//                return View();
-//            }
-//        }
+      return Ok(newPosts);
+    }
 
-//        // GET: Posts/Delete/5
-//        public ActionResult Delete(int id)
-//        {
-//            return View();
-//        }
+    // GET: Posts/Details/5
+    [HttpGet("post/{id}")]
+    public IActionResult Details(int? id)
+    {
+      if (id == null)
+      {
+        return BadRequest();
+      }
 
-//        // POST: Posts/Delete/5
-//        [HttpPost]
-//        [ValidateAntiForgeryToken]
-//        public ActionResult Delete(int id, IFormCollection collection)
-//        {
-//            try
-//            {
-//                return RedirectToAction(nameof(Index));
-//            }
-//            catch
-//            {
-//                return View();
-//            }
-//        }
-//    }
-//}
+      Post postToReturn = _context.Posts.Find(id);
+      if (postToReturn == null)
+      {
+        return NotFound();
+      }
+
+      postToReturn.Content = Base64Decode(postToReturn.Content);
+
+      return Ok(postToReturn);
+    }
+
+    //Encrypt the post
+    // GET: Posts/Create
+    [HttpPost("post")]
+    public IActionResult Create([FromBody] PostDTO request)
+    {
+
+      bool validRequest = request != null;
+      validRequest |= (request._title != null);
+      validRequest |= (request._content != null);
+      validRequest |= (request._timestamp != null);
+      validRequest |= (request._privacyStatusId != null);
+      validRequest |= (request._userId != null);
+
+      if (!validRequest)
+      {
+        return BadRequest();
+      }
+
+      Post newPost = new Post();
+
+      newPost.Title = request._title;
+      newPost.Content = Base64Encode(request._content);
+      newPost.Timestamp = request._timestamp;
+      newPost.PrivacyStatusId = request._privacyStatusId;
+      newPost.UserId = request._userId;
+
+      _context.Add(newPost);
+      _context.SaveChanges();
+
+      return Ok(newPost);
+    }
+
+
+    //Encrypt the post
+    [HttpPut("post/{id}")]
+    public IActionResult EditPut(int? id, [FromBody] PostDTO request)
+    {
+      if (id == null)
+      {
+        return BadRequest();
+      }
+
+      bool validRequest = request != null;
+      validRequest |= (request._title != null);
+      validRequest |= (request._content != null);
+      validRequest |= (request._timestamp != null);
+      validRequest |= (request._privacyStatusId != null);
+      validRequest |= (request._userId != null);
+
+      if (!validRequest)
+      {
+        return BadRequest();
+      }
+
+      Post postToEdit = _context.Posts.Find(id);
+      if (postToEdit == null)
+      {
+        return NotFound();
+      }
+
+
+      Post newPost = new Post();
+
+      newPost.Title = request._title;
+      newPost.Content = Base64Encode(request._content);
+      newPost.Timestamp = request._timestamp;
+      newPost.PrivacyStatusId = request._privacyStatusId;
+      newPost.UserId = request._userId;
+
+
+      _context.Entry(postToEdit).CurrentValues.SetValues(newPost);
+      _context.SaveChanges();
+
+
+      return Ok(newPost);
+    }
+
+
+    public static string Base64Decode(string base64EncodedData)
+    {
+      var base64EncodedBytes = System.Convert.FromBase64String(base64EncodedData);
+      return System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
+    }
+    public static string Base64Encode(string plainText)
+    {
+      var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(plainText);
+      return System.Convert.ToBase64String(plainTextBytes);
+    }
+
+
+  }
+}
