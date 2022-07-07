@@ -16,10 +16,31 @@ namespace SecretVaultAPI.Controllers
     public SecretVaultDBContext _context = new SecretVaultDBContext();
 
     [HttpGet("post")]
-    public IActionResult DetailsForAllPosts()
+    public IActionResult DetailsForAllPublicPosts()
     {
 
-      List<Post> posts = _context.Posts.ToList();
+      List<Post> posts = _context.Posts.Where(item => item.PrivacyStatusId == 2).ToList();
+      List<Post> newPosts = new List<Post>();
+      foreach (Post post in posts)
+      {
+        post.Content = Base64Decode(post.Content);
+
+        newPosts.Add(post);
+      }
+
+      return Ok(newPosts);
+    }
+
+    [HttpGet("post/user/{id}")]
+    public IActionResult DetailsForAllUserPosts(int? id)
+    {
+
+    if (id == null)
+      {
+        return BadRequest();
+      }
+
+      List<Post> posts = _context.Posts.Where(item => item.UserId == id).ToList();
       List<Post> newPosts = new List<Post>();
       foreach (Post post in posts)
       {
