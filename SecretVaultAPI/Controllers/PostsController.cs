@@ -4,6 +4,7 @@ using SecretVaultAPI.DTOs;
 using SecretVaultAPI.Model;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace SecretVaultAPI.Controllers
 {
@@ -59,7 +60,6 @@ namespace SecretVaultAPI.Controllers
       bool validRequest = request != null;
       validRequest |= (request._title != null);
       validRequest |= (request._content != null);
-      validRequest |= (request._timestamp != null);
       validRequest |= (request._privacyStatusId != null);
       validRequest |= (request._userId != null);
 
@@ -72,7 +72,7 @@ namespace SecretVaultAPI.Controllers
 
       newPost.Title = request._title;
       newPost.Content = Base64Encode(request._content);
-      newPost.Timestamp = request._timestamp;
+      newPost.Timestamp = DateTime.Now;
       newPost.PrivacyStatusId = request._privacyStatusId;
       newPost.UserId = request._userId;
 
@@ -95,7 +95,6 @@ namespace SecretVaultAPI.Controllers
       bool validRequest = request != null;
       validRequest |= (request._title != null);
       validRequest |= (request._content != null);
-      validRequest |= (request._timestamp != null);
       validRequest |= (request._privacyStatusId != null);
       validRequest |= (request._userId != null);
 
@@ -115,10 +114,12 @@ namespace SecretVaultAPI.Controllers
 
       newPost.Title = request._title;
       newPost.Content = Base64Encode(request._content);
-      newPost.Timestamp = request._timestamp;
+      newPost.Timestamp = DateTime.Now;
       newPost.PrivacyStatusId = request._privacyStatusId;
       newPost.UserId = request._userId;
 
+
+        newPost.PostId = postToEdit.PostId;
 
       _context.Entry(postToEdit).CurrentValues.SetValues(newPost);
       _context.SaveChanges();
@@ -126,6 +127,58 @@ namespace SecretVaultAPI.Controllers
 
       return Ok(newPost);
     }
+
+    [HttpPatch("post/{id}")]
+    public IActionResult EditPatch(int? id, [FromBody] PostDTO request)
+    {
+      if (id == null)
+      {
+        return BadRequest();
+      }
+
+
+      Post postToEdit = _context.Posts.Find(id);
+      if (postToEdit == null)
+      {
+        return NotFound();
+      }
+
+      postToEdit.Title = (request._title == null) ? postToEdit.Title : request._title;
+      postToEdit.Content = (request._content == null) ? postToEdit.Content : Base64Encode(request._content);
+      postToEdit.Timestamp = DateTime.Now;
+      postToEdit.PrivacyStatusId = (request._privacyStatusId  == 0) ? postToEdit.PrivacyStatusId :  request._privacyStatusId;
+      postToEdit.UserId = (request._userId  == 0) ? postToEdit.UserId : request._userId;
+
+      _context.Posts.Update(postToEdit);
+      _context.SaveChanges();
+
+
+      return Ok(postToEdit);
+    }
+
+    [HttpDelete("post/{id}")]
+        public IActionResult Delete(int? id)
+        {
+            if (id == null)
+            {
+                return BadRequest();
+            }
+
+            Post postToDelete = _context.Posts.Find(id);
+
+            try
+            {
+                _context.Posts.Remove(postToDelete);
+                _context.SaveChanges();
+            }
+            catch  (Exception e)
+            {
+                Console.WriteLine("Error");
+            }
+
+
+            return Ok(postToDelete);
+        }
 
 
     public static string Base64Decode(string base64EncodedData)

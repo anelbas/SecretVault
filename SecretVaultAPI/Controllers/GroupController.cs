@@ -38,9 +38,35 @@ namespace SecretVaultAPI.Controllers
         }
 
         [HttpPost("/group")]
-        public IActionResult Create()
+        public IActionResult Create([FromBody] GroupDTO request)
         {
-            return View();
+
+            bool validRequest = request != null;
+            validRequest |= (request._createdBy != null);
+            validRequest |= (request._groupName != null);
+
+            if (!validRequest)
+            {
+                return BadRequest();
+            }
+
+            Group newGroup = new Group();
+
+            newGroup.CreatedBy = (int)request._createdBy;
+            newGroup.GroupName = request._groupName;
+
+            try
+            {
+                _context.Groups.Add(newGroup);
+                _context.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+
+
+            return Ok(newGroup);
         }
 
         [HttpPut("group/{id}")]

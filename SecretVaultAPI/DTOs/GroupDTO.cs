@@ -8,4 +8,5 @@
         public string _groupName { get => GroupName; set => GroupName = value; }
         public int? _createdBy { get => CreatedBy; set => CreatedBy = value; }
     }
+
 }
