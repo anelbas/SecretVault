@@ -34,9 +34,12 @@ namespace SecretVaultAPI.Controllers
         return NotFound();
       }
 
+      postToReturn.Content = Base64Decode(postToReturn.Content);
+
       return Ok(postToReturn);
     }
 
+    //Encrypt the post
     // GET: Posts/Create
     [HttpPost("post")]
     public IActionResult Create([FromBody] PostDTO request)
@@ -57,7 +60,7 @@ namespace SecretVaultAPI.Controllers
       Post newPost = new Post();
 
       newPost.Title = request._title;
-      newPost.Content = request._content;
+      newPost.Content = Base64Encode(request._content);
       newPost.Timestamp = request._timestamp;
       newPost.PrivacyStatusId = request._privacyStatusId;
       newPost.UserId = request._userId;
@@ -68,6 +71,8 @@ namespace SecretVaultAPI.Controllers
       return Ok(newPost);
     }
 
+
+    //Encrypt the post
     [HttpPut("post/{id}")]
     public IActionResult EditPut(int? id, [FromBody] PostDTO request)
     {
@@ -98,7 +103,7 @@ namespace SecretVaultAPI.Controllers
       Post newPost = new Post();
 
       newPost.Title = request._title;
-      newPost.Content = request._content;
+      newPost.Content = Base64Encode(request._content);
       newPost.Timestamp = request._timestamp;
       newPost.PrivacyStatusId = request._privacyStatusId;
       newPost.UserId = request._userId;
@@ -112,7 +117,16 @@ namespace SecretVaultAPI.Controllers
     }
 
 
-
+    public static string Base64Decode(string base64EncodedData)
+    {
+      var base64EncodedBytes = System.Convert.FromBase64String(base64EncodedData);
+      return System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
+    }
+    public static string Base64Encode(string plainText)
+    {
+      var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(plainText);
+      return System.Convert.ToBase64String(plainTextBytes);
+    }
 
 
   }
