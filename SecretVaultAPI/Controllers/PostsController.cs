@@ -5,184 +5,265 @@ using SecretVaultAPI.Model;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using SecretVaultAPI.Utils;
+using SecretVaultAPI.Adapter;
 
 namespace SecretVaultAPI.Controllers
 {
-  [ApiController]
-  [Route("[controller]")]
-  public class PostsController : Controller
-  {
-
-    public SecretVaultDBContext _context = new SecretVaultDBContext();
-
-    [HttpGet("post")]
-    public IActionResult DetailsForAllPublicPosts()
+    [ApiController]
+    [Route("v1/[controller]")]
+    public class PostsController : Controller
     {
 
-      List<Post> posts = _context.Posts.Where(item => item.PrivacyStatusId == 2).ToList();
-      List<Post> newPosts = new List<Post>();
-      foreach (Post post in posts)
-      {
-        post.Content = Base64Decode(post.Content);
+        public SecretVaultDBContext _context = new SecretVaultDBContext();
+        public ForeignKeyObjectUtil _fkUtil = new ForeignKeyObjectUtil();
+        public EncodingUtil _encodingUtil = new EncodingUtil();
+        public ResponseAdapter _responseAdapter = new ResponseAdapter();
 
-        newPosts.Add(post);
-      }
+        [HttpGet]
+        public IActionResult DetailsForAllPublicPosts()
+        {
+            List<Post> posts = _context.Posts.Where(item => item.PrivacyStatusId == 2).ToList();
+            posts.ForEach(post => post.Content = _encodingUtil.Base64Decode(post.Content));
+            List<PostDTO> postsDTO = new List<PostDTO>();
 
-      return Ok(newPosts);
-    }
+            try
+            {
+                posts.ForEach(post => postsDTO.Add(_responseAdapter.asDTO(post)));
+            }
+            catch
+            {
+                return StatusCode(500, "Unable to fetch posts from database.");
+            }
 
-    [HttpGet("post/user/{id}")]
-    public IActionResult DetailsForAllUserPosts(int? id)
-    {
+            return Ok(postsDTO);
+        }
 
-    if (id == null)
-      {
-        return BadRequest();
-      }
+        [HttpGet("user/{userId}")]
+        public IActionResult DetailsForAllUserPosts(int? userId)
+        {
 
-      List<Post> posts = _context.Posts.Where(item => item.UserId == id).ToList();
-      List<Post> newPosts = new List<Post>();
-      foreach (Post post in posts)
-      {
-        post.Content = Base64Decode(post.Content);
+            if (userId == null)
+            {
+                return BadRequest("Please provide a user id");
+            }
 
-        newPosts.Add(post);
-      }
+            if(_context.Users.Find(userId) == null)
+            {
+                return NotFound("Please provide a valid user id");
+            }
 
-      return Ok(newPosts);
-    }
+            List<Post> posts = _context.Posts.Where(item => item.UserId == userId).ToList();
+            if(posts.Count == 0)
+            {
+                return Ok("No posts found for user");
+            }
+            posts.ForEach(post => post.Content = _encodingUtil.Base64Decode(post.Content));
 
-    // GET: Posts/Details/5
-    [HttpGet("post/{id}")]
-    public IActionResult Details(int? id)
-    {
-      if (id == null)
-      {
-        return BadRequest();
-      }
+            List<PostDTO> postsDTO = new List<PostDTO>();
 
-      Post postToReturn = _context.Posts.Find(id);
-      if (postToReturn == null)
-      {
-        return NotFound();
-      }
+            try
+            {
+                posts.ForEach(post => postsDTO.Add(_responseAdapter.asDTO(post)));
+            }
+            catch
+            {
+                return StatusCode(500, "Unable to fetch posts from database.");
+            }
 
-      postToReturn.Content = Base64Decode(postToReturn.Content);
+            return Ok(postsDTO);
+        }
 
-      return Ok(postToReturn);
-    }
+        // GET: Posts/Details/5
+        [HttpGet("{id}")]
+        public IActionResult Details(int? id)
+        {
+            if (id == null)
+            {
+                return BadRequest("Please provide an id");
+            }
 
-    //Encrypt the post
-    // GET: Posts/Create
-    [HttpPost("post")]
-    public IActionResult Create([FromBody] PostDTO request)
-    {
+            Post postToReturn = _context.Posts.Find(id);
+            if (postToReturn == null)
+            {
+                return NotFound("Please provide a valid id");
+            }
 
-      bool validRequest = request != null;
-      validRequest |= (request._title != null);
-      validRequest |= (request._content != null);
-      validRequest |= (request._privacyStatusId != null);
-      validRequest |= (request._userId != null);
+            try
+            {
+                postToReturn.Content = _encodingUtil.Base64Decode(postToReturn.Content);
+            }
+            catch
+            {
+                return StatusCode(500, "Unable to fetch post details from database.");
+            }
 
-      if (!validRequest)
-      {
-        return BadRequest();
-      }
+            return Ok(_responseAdapter.asDTO(postToReturn));
+        }
 
-      Post newPost = new Post();
+        //Encrypt the post
+        [HttpPost]
+        public IActionResult Create([FromBody] PostDTO request)
+        {
 
-      newPost.Title = request._title;
-      newPost.Content = Base64Encode(request._content);
-      newPost.Timestamp = DateTime.Now;
-      newPost.PrivacyStatusId = request._privacyStatusId;
-      newPost.UserId = request._userId;
+            bool validRequest = request != null;
+            validRequest |= (request.title != null);
+            validRequest |= (request.content != null);
+            validRequest |= (request.privacyStatus != null);
+            validRequest |= (request.userId != 0);
 
-      _context.Add(newPost);
-      _context.SaveChanges();
+            if (!validRequest)
+            {
+                return BadRequest("Please enter all the valid information");
+            }
 
-      return Ok(newPost);
-    }
+            User user = _context.Users.Find(request.userId);
+            if(user == null)
+            {
+                return BadRequest("Please provide a valid user id");
+            }
+
+            Post newPost = new Post();
+
+            newPost.Title = request.title;
+            newPost.Content = _encodingUtil.Base64Encode(request.content);
+            newPost.Timestamp = DateTime.Now;
+
+            PrivacyStatus privacyObject = _fkUtil.getPrivacyStatus(request.privacyStatus);
+
+            if(privacyObject == null)
+            {
+                return BadRequest("Please enter a valid privacy status");
+            }
+
+            try
+            {
+                newPost.PrivacyStatus = privacyObject;
+                newPost.PrivacyStatusId = privacyObject.PrivacyStatusId;
+                privacyObject.Posts.Add(newPost);
+                newPost.UserId = request.userId;
+                newPost.User = user;
+                user.Posts.Add(newPost);
+
+                _context.Posts.Update(newPost);
+                _context.SaveChanges();
+            }
+            catch
+            {
+                return StatusCode(500, "Unable to create new post.");
+            }
+
+            return Ok(_responseAdapter.asDTO(newPost));
+        }
+
+        //Encrypt the post
+        [HttpPut("{id}")]
+        public IActionResult EditPut(int? id, [FromBody] PostDTO request)
+        {
+            if (id == null)
+            {
+                return BadRequest("Please provide a valid id");
+            }
+
+            bool validRequest = request != null;
+            validRequest |= (request.title != null);
+            validRequest |= (request.content != null);
+            validRequest |= (request.privacyStatus != null);
+
+            if (!validRequest)
+            {
+                return BadRequest("Please enter all the valid information");
+            }
+
+            Post postToEdit = _context.Posts.Find(id);
+            if (postToEdit == null)
+            {
+                return NotFound("Please provide a valid id");
+            }
+
+            Post newPost = new Post();
+
+            PrivacyStatus privacyObject = _fkUtil.getPrivacyStatus(request.privacyStatus);
+
+            newPost.PostId = postToEdit.PostId;
+            newPost.Title = request.title;
+            newPost.Content = _encodingUtil.Base64Encode(request.content);
+            newPost.Timestamp = DateTime.Now;
+
+            try
+            {
+                newPost.PrivacyStatusId = privacyObject.PrivacyStatusId;
+                newPost.PrivacyStatus = privacyObject;
+                privacyObject.Posts.Add(newPost);
+
+                newPost.UserId = postToEdit.UserId;
+                newPost.User = _context.Users.Find(newPost.UserId);
+
+                _context.Entry(postToEdit).CurrentValues.SetValues(newPost);
+                _context.SaveChanges();
+            }
+            catch
+            {
+                return StatusCode(500, "Unable to save changes.");
+            }
+
+            return Ok(_responseAdapter.asDTO(newPost));
+        }
+
+        [HttpPatch("{id}")]
+        public IActionResult EditPatch(int? id, [FromBody] PostDTO request)
+        {
+            if (id == null)
+            {
+                return BadRequest("Please provide a valid id");
+            }
+
+            Post postToEdit = _context.Posts.Find(id);
+            if (postToEdit == null)
+            {
+                return NotFound("Please provide a valid id");
+            }
+
+            if(request == null)
+            {
+                return BadRequest("Please send a valid request");
+            }
+
+            if(request.privacyStatus != null)
+            {
+                PrivacyStatus privacyObject = _fkUtil.getPrivacyStatus(request.privacyStatus);
+                if (privacyObject != null)
+                {
+                    postToEdit.PrivacyStatusId = privacyObject.PrivacyStatusId;
+                    postToEdit.PrivacyStatus = privacyObject;
+                    privacyObject.Posts.Add(postToEdit);
+                }
+            }
+            
+            postToEdit.Title = (request.title == null) ? postToEdit.Title : request.title;
+            postToEdit.Content = (request.content == null) ? postToEdit.Content : _encodingUtil.Base64Encode(request.content);
+            postToEdit.Timestamp = DateTime.Now;
+
+            try
+            {
+                _context.Posts.Update(postToEdit);
+                _context.SaveChanges();
+            }
+            catch
+            {
+                return StatusCode(500, "Unable to save changes.");
+            }
 
 
-    //Encrypt the post
-    [HttpPut("post/{id}")]
-    public IActionResult EditPut(int? id, [FromBody] PostDTO request)
-    {
-      if (id == null)
-      {
-        return BadRequest();
-      }
+            return Ok(_responseAdapter.asDTO(postToEdit));
+        }
 
-      bool validRequest = request != null;
-      validRequest |= (request._title != null);
-      validRequest |= (request._content != null);
-      validRequest |= (request._privacyStatusId != null);
-      validRequest |= (request._userId != null);
-
-      if (!validRequest)
-      {
-        return BadRequest();
-      }
-
-      Post postToEdit = _context.Posts.Find(id);
-      if (postToEdit == null)
-      {
-        return NotFound();
-      }
-
-
-      Post newPost = new Post();
-
-      newPost.Title = request._title;
-      newPost.Content = Base64Encode(request._content);
-      newPost.Timestamp = DateTime.Now;
-      newPost.PrivacyStatusId = request._privacyStatusId;
-      newPost.UserId = request._userId;
-
-
-        newPost.PostId = postToEdit.PostId;
-
-      _context.Entry(postToEdit).CurrentValues.SetValues(newPost);
-      _context.SaveChanges();
-
-
-      return Ok(newPost);
-    }
-
-    [HttpPatch("post/{id}")]
-    public IActionResult EditPatch(int? id, [FromBody] PostDTO request)
-    {
-      if (id == null)
-      {
-        return BadRequest();
-      }
-
-
-      Post postToEdit = _context.Posts.Find(id);
-      if (postToEdit == null)
-      {
-        return NotFound();
-      }
-
-      postToEdit.Title = (request._title == null) ? postToEdit.Title : request._title;
-      postToEdit.Content = (request._content == null) ? postToEdit.Content : Base64Encode(request._content);
-      postToEdit.Timestamp = DateTime.Now;
-      postToEdit.PrivacyStatusId = (request._privacyStatusId  == 0) ? postToEdit.PrivacyStatusId :  request._privacyStatusId;
-      postToEdit.UserId = (request._userId  == 0) ? postToEdit.UserId : request._userId;
-
-      _context.Posts.Update(postToEdit);
-      _context.SaveChanges();
-
-
-      return Ok(postToEdit);
-    }
-
-    [HttpDelete("post/{id}")]
+        [HttpDelete("{id}")]
         public IActionResult Delete(int? id)
         {
             if (id == null)
             {
-                return BadRequest();
+                return BadRequest("Please provide a valid id");
             }
 
             Post postToDelete = _context.Posts.Find(id);
@@ -192,27 +273,13 @@ namespace SecretVaultAPI.Controllers
                 _context.Posts.Remove(postToDelete);
                 _context.SaveChanges();
             }
-            catch  (Exception e)
+            catch (Exception e)
             {
-                Console.WriteLine("Error");
+                return StatusCode(500, "Unable to delete post.");
             }
 
-
-            return Ok(postToDelete);
+            return Ok(_responseAdapter.asDTO(postToDelete));
         }
 
-
-    public static string Base64Decode(string base64EncodedData)
-    {
-      var base64EncodedBytes = System.Convert.FromBase64String(base64EncodedData);
-      return System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
     }
-    public static string Base64Encode(string plainText)
-    {
-      var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(plainText);
-      return System.Convert.ToBase64String(plainTextBytes);
-    }
-
-
-  }
 }
