@@ -26,7 +26,15 @@ namespace SecretVaultAPI.Controllers
             List<Post> posts = _context.Posts.Where(item => item.PrivacyStatusId == 2).ToList();
             posts.ForEach(post => post.Content = _encodingUtil.Base64Decode(post.Content));
             List<PostDTO> postsDTO = new List<PostDTO>();
-            posts.ForEach(post => postsDTO.Add(_responseAdapter.asDTO(post)));
+
+            try
+            {
+                posts.ForEach(post => postsDTO.Add(_responseAdapter.asDTO(post)));
+            }
+            catch
+            {
+                return StatusCode(500, "Unable to fetch posts from database.");
+            }
 
             return Ok(postsDTO);
         }
@@ -53,7 +61,15 @@ namespace SecretVaultAPI.Controllers
             posts.ForEach(post => post.Content = _encodingUtil.Base64Decode(post.Content));
 
             List<PostDTO> postsDTO = new List<PostDTO>();
-            posts.ForEach(post => postsDTO.Add(_responseAdapter.asDTO(post)));
+
+            try
+            {
+                posts.ForEach(post => postsDTO.Add(_responseAdapter.asDTO(post)));
+            }
+            catch
+            {
+                return StatusCode(500, "Unable to fetch posts from database.");
+            }
 
             return Ok(postsDTO);
         }
@@ -73,7 +89,14 @@ namespace SecretVaultAPI.Controllers
                 return NotFound("Please provide a valid id");
             }
 
-            postToReturn.Content = _encodingUtil.Base64Decode(postToReturn.Content);
+            try
+            {
+                postToReturn.Content = _encodingUtil.Base64Decode(postToReturn.Content);
+            }
+            catch
+            {
+                return StatusCode(500, "Unable to fetch post details from database.");
+            }
 
             return Ok(_responseAdapter.asDTO(postToReturn));
         }
@@ -107,23 +130,31 @@ namespace SecretVaultAPI.Controllers
             newPost.Timestamp = DateTime.Now;
 
             PrivacyStatus privacyObject = _fkUtil.getPrivacyStatus(request.privacyStatus);
+
             if(privacyObject == null)
             {
                 return BadRequest("Please enter a valid privacy status");
             }
-            newPost.PrivacyStatus = privacyObject;
-            newPost.PrivacyStatusId = privacyObject.PrivacyStatusId;
-            privacyObject.Posts.Add(newPost);
-            newPost.UserId = request.userId;
-            newPost.User = user;
-            user.Posts.Add(newPost);
 
-            _context.Posts.Update(newPost);
-            _context.SaveChanges();
+            try
+            {
+                newPost.PrivacyStatus = privacyObject;
+                newPost.PrivacyStatusId = privacyObject.PrivacyStatusId;
+                privacyObject.Posts.Add(newPost);
+                newPost.UserId = request.userId;
+                newPost.User = user;
+                user.Posts.Add(newPost);
+
+                _context.Posts.Update(newPost);
+                _context.SaveChanges();
+            }
+            catch
+            {
+                return StatusCode(500, "Unable to create new post.");
+            }
 
             return Ok(_responseAdapter.asDTO(newPost));
         }
-
 
         //Encrypt the post
         [HttpPut("{id}")]
@@ -150,7 +181,6 @@ namespace SecretVaultAPI.Controllers
                 return NotFound("Please provide a valid id");
             }
 
-
             Post newPost = new Post();
 
             PrivacyStatus privacyObject = _fkUtil.getPrivacyStatus(request.privacyStatus);
@@ -160,16 +190,22 @@ namespace SecretVaultAPI.Controllers
             newPost.Content = _encodingUtil.Base64Encode(request.content);
             newPost.Timestamp = DateTime.Now;
 
-            newPost.PrivacyStatusId = privacyObject.PrivacyStatusId;
-            newPost.PrivacyStatus = privacyObject;
-            privacyObject.Posts.Add(newPost);
+            try
+            {
+                newPost.PrivacyStatusId = privacyObject.PrivacyStatusId;
+                newPost.PrivacyStatus = privacyObject;
+                privacyObject.Posts.Add(newPost);
 
-            newPost.UserId = postToEdit.UserId;
-            newPost.User = _context.Users.Find(newPost.UserId);
+                newPost.UserId = postToEdit.UserId;
+                newPost.User = _context.Users.Find(newPost.UserId);
 
-            _context.Entry(postToEdit).CurrentValues.SetValues(newPost);
-            _context.SaveChanges();
-
+                _context.Entry(postToEdit).CurrentValues.SetValues(newPost);
+                _context.SaveChanges();
+            }
+            catch
+            {
+                return StatusCode(500, "Unable to save changes.");
+            }
 
             return Ok(_responseAdapter.asDTO(newPost));
         }
@@ -181,7 +217,6 @@ namespace SecretVaultAPI.Controllers
             {
                 return BadRequest("Please provide a valid id");
             }
-
 
             Post postToEdit = _context.Posts.Find(id);
             if (postToEdit == null)
@@ -205,13 +240,19 @@ namespace SecretVaultAPI.Controllers
                 }
             }
             
-
             postToEdit.Title = (request.title == null) ? postToEdit.Title : request.title;
             postToEdit.Content = (request.content == null) ? postToEdit.Content : _encodingUtil.Base64Encode(request.content);
             postToEdit.Timestamp = DateTime.Now;
 
-            _context.Posts.Update(postToEdit);
-            _context.SaveChanges();
+            try
+            {
+                _context.Posts.Update(postToEdit);
+                _context.SaveChanges();
+            }
+            catch
+            {
+                return StatusCode(500, "Unable to save changes.");
+            }
 
 
             return Ok(_responseAdapter.asDTO(postToEdit));
@@ -222,7 +263,7 @@ namespace SecretVaultAPI.Controllers
         {
             if (id == null)
             {
-                return BadRequest();
+                return BadRequest("Please provide a valid id");
             }
 
             Post postToDelete = _context.Posts.Find(id);
@@ -234,13 +275,11 @@ namespace SecretVaultAPI.Controllers
             }
             catch (Exception e)
             {
-                Console.WriteLine("Error");
+                return StatusCode(500, "Unable to delete post.");
             }
-
 
             return Ok(_responseAdapter.asDTO(postToDelete));
         }
-
 
     }
 }
