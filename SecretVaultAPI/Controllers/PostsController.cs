@@ -74,6 +74,57 @@ namespace SecretVaultAPI.Controllers
             return Ok(postsDTO);
         }
 
+        [HttpPost("user/{userId}")]
+        public IActionResult SearchPostTitle(int? userId, string title)
+        {
+
+            if (userId == null)
+            {
+                return BadRequest("Please provide a user id");
+            }
+
+            if(_context.Users.Find(userId) == null)
+            {
+                return NotFound("Please provide a valid user id");
+            }
+
+            List<Post> posts = _context.Posts.Where(item => item.UserId == userId).ToList();
+            if(posts.Count == 0)
+            {
+                return Ok("No posts found for user");
+            }
+
+            List<Post> selectedPosts = new List<Post>();
+            
+            posts.ForEach(post => 
+            {
+                if(post.Title.Contains(title)) {
+                    selectedPosts.Add(post);
+                }
+            });
+
+            if(selectedPosts.Count == 0)
+            {
+                return Ok("No posts found for title search");
+            }
+
+            selectedPosts.ForEach(post => post.Content = _encodingUtil.Base64Decode(post.Content));
+
+            List<PostDTO> postsDTO = new List<PostDTO>();
+
+            try
+            {
+                selectedPosts.ForEach(post => postsDTO.Add(_responseAdapter.asDTO(post)));
+            }
+            catch
+            {
+                return StatusCode(500, "Unable to fetch posts from database.");
+            }
+
+            return Ok(postsDTO);
+        }
+
+
         // GET: Posts/Details/5
         [HttpGet("{id}")]
         public IActionResult Details(int? id)
