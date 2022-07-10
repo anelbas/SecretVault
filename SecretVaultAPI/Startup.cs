@@ -43,6 +43,14 @@ options.UseSqlServer(Configuration.GetConnectionString("DBConnection")));
             });
 
             services.AddControllersWithViews();
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy(name: "PostsPolicy", builder =>
+                {
+                    builder.WithOrigins("route name").AllowAnyHeader().AllowAnyMethod();
+                });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -58,6 +66,8 @@ options.UseSqlServer(Configuration.GetConnectionString("DBConnection")));
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors();
 
             app.UseAuthorization();
 
