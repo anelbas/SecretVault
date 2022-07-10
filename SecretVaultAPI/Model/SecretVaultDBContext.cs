@@ -20,10 +20,7 @@ namespace SecretVaultAPI.Model
         {
         }
 
-        public virtual DbSet<Group> Groups { get; set; }
-        public virtual DbSet<GroupUser> GroupUsers { get; set; }
         public virtual DbSet<Post> Posts { get; set; }
-        public virtual DbSet<PostGroup> PostGroups { get; set; }
         public virtual DbSet<PrivacyStatus> PrivacyStatuses { get; set; }
         public virtual DbSet<User> Users { get; set; }
 
@@ -44,47 +41,13 @@ namespace SecretVaultAPI.Model
         {
             modelBuilder.HasAnnotation("Relational:Collation", "SQL_Latin1_General_CP1_CI_AS");
 
-            modelBuilder.Entity<Group>(entity =>
-            {
-                entity.ToTable("Group");
-
-                entity.Property(e => e.GroupName)
-                    .IsRequired()
-                    .HasMaxLength(255)
-                    .IsUnicode(false);
-
-                entity.HasOne(d => d.CreatedByNavigation)
-                    .WithMany(p => p.Groups)
-                    .HasForeignKey(d => d.CreatedBy)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Group__CreatedBy__4222D4EF");
-            });
-
-            modelBuilder.Entity<GroupUser>(entity =>
-            {
-                entity.ToTable("GroupUser");
-
-                entity.HasOne(d => d.Group)
-                    .WithMany(p => p.GroupUsers)
-                    .HasForeignKey(d => d.GroupId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__GroupUser__Group__440B1D61");
-
-                entity.HasOne(d => d.Usr)
-                    .WithMany(p => p.GroupUsers)
-                    .HasForeignKey(d => d.UsrId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__GroupUser__UsrId__4316F928");
-            });
-
             modelBuilder.Entity<Post>(entity =>
             {
                 entity.ToTable("Post");
 
                 entity.Property(e => e.Content)
                     .IsRequired()
-                    .IsUnicode(false)
-                    .UseCollation("Latin1_General_BIN2");
+                    .IsUnicode(false);
 
                 entity.Property(e => e.Timestamp).HasColumnType("datetime");
 
@@ -97,30 +60,13 @@ namespace SecretVaultAPI.Model
                     .WithMany(p => p.Posts)
                     .HasForeignKey(d => d.PrivacyStatusId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Post__PrivacySta__48CFD27E");
+                    .HasConstraintName("FK__Post__PrivacySta__3A81B327");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.Posts)
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Post__UserId__4AB81AF0");
-            });
-
-            modelBuilder.Entity<PostGroup>(entity =>
-            {
-                entity.ToTable("PostGroup");
-
-                entity.HasOne(d => d.Group)
-                    .WithMany(p => p.PostGroups)
-                    .HasForeignKey(d => d.GroupId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__PostGroup__Group__45F365D3");
-
-                entity.HasOne(d => d.Post)
-                    .WithMany(p => p.PostGroups)
-                    .HasForeignKey(d => d.PostId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__PostGroup__PostI__49C3F6B7");
+                    .HasConstraintName("FK__Post__UserId__3B75D760");
             });
 
             modelBuilder.Entity<PrivacyStatus>(entity =>
