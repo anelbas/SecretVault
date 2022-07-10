@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300&family=Luckiest+Guy&display=swap');
 
 body {
     background-color: #E4DCCF;
@@ -65,7 +65,7 @@ header, footer {
     border-radius:2em;
     box-sizing: border-box;
     background-color: #7D9D9C;
-    font-family: 'Abhaya Libre', sans-serif;
+    font-family: 'Comfortaa', cursive;
     font-weight: 700;
     color:#FFFFFF;
     font-size: 1em;
@@ -90,7 +90,7 @@ header, footer {
     border-radius:2em;
     box-sizing: border-box;
     background-color: #7D9D9C;
-    font-family: 'Abhaya Libre', sans-serif;
+    font-family: 'Comfortaa', cursive;
     font-weight: 700;
     font-size: 1em;
 }

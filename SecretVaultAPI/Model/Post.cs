@@ -15,7 +15,7 @@ namespace SecretVaultAPI.Model
         public int PostId { get; set; }
         public string Title { get; set; }
         public string Content { get; set; }
-        public DateTime? Timestamp { get; set; }
+        public DateTime Timestamp { get; set; }
         public int PrivacyStatusId { get; set; }
         public int UserId { get; set; }
 
