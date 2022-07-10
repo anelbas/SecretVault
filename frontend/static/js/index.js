@@ -201,3 +201,7 @@ function submit(type) {
         })
     };
 }
+
+function openPage(url) {
+    window.location.replace(url);
+}
