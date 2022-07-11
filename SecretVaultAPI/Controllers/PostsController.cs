@@ -78,7 +78,7 @@ namespace SecretVaultAPI.Controllers
         }
 
         [EnableCors("PostsPolicy")]
-        [HttpPost("user/{userId}")]
+        [HttpGet("user/{userId}/{title}")]
         public IActionResult SearchPostTitle(int? userId, string title)
         {
 
@@ -102,7 +102,7 @@ namespace SecretVaultAPI.Controllers
             
             posts.ForEach(post => 
             {
-                if(post.Title.Contains(title)) {
+                if(post.Title.ToLower().Contains(title.ToLower())) {
                     selectedPosts.Add(post);
                 }
             });
