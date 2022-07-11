@@ -1,0 +1,40 @@
+<!-- TODO: Lazy load the password dictionaries -->
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Secret Vault</title>
+        <meta charset="UTF-8" />
+        <link rel="stylesheet" href="../static/css/signup.css" />
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/@zxcvbn-ts/core@2.0.0/dist/zxcvbn-ts.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@zxcvbn-ts/language-common@2.0.0/dist/zxcvbn-ts.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@zxcvbn-ts/language-en@2.0.0/dist/zxcvbn-ts.js"></script>
+      </head>
+      <body>
+    </head>
+    <header>
+        <h2 id="title">SECRET VAULT</h2>
+    </header>
+    <body>
+        <img id="lockimage" src="../static/images/lock.png"/>
+        
+        <section>
+            <!-- <h1>Sign Up</h1> -->
+            <input type="email" id="email" placeholder="Email Address" >
+            <input type="text" id="username" placeholder="Username" >
+            <input type="password" id="password" placeholder="Password" >
+            <meter max="4" id="password-strength-meter"></meter>
+            <p id="password-strength-text"></p>
+            <button id="signup-btn" onclick="validateSignup()">Sign Up</button>
+        </section>
+        
+
+    <footer></footer>
+    </body>
+
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+        <script src="../static/js/index.js"></script>
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+        <script src="../static/js/signup.js"></script>
+
+    </html>
