@@ -48,7 +48,8 @@ options.UseSqlServer(Configuration.GetConnectionString("DBConnection")));
             {
                 options.AddPolicy(name: "PostsPolicy", builder =>
                 {
-                    builder.WithOrigins("route name").AllowAnyHeader().AllowAnyMethod();
+                    //To be changed to deployed URL
+                    builder.WithOrigins("http://localhost:3003").AllowAnyHeader().AllowAnyMethod();
                 });
             });
         }
