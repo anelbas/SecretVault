@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SecretVaultAPI.DTOs
+namespace SecretVaultServerless.DTOs
 {
   public class PostDTO
   {

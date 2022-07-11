@@ -11,10 +11,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using SecretVaultAPI.Model;
+using SecretVaultServerless.Model;
 using Microsoft.EntityFrameworkCore;
 
-namespace SecretVaultAPI
+namespace SecretVaultServerless
 {
     public class Startup
     {
@@ -32,49 +32,39 @@ namespace SecretVaultAPI
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "SecretVaultAPI", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "SecretVaultServerless", Version = "v1" });
             });
 
             services.AddDbContext<SecretVaultDBContext>(options =>
-options.UseSqlServer(Configuration.GetConnectionString("DBConnection")));
+options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddSession(options =>
             {
                 options.IdleTimeout = TimeSpan.FromMinutes(30);
             });
 
             services.AddControllersWithViews();
-
-            services.AddCors(options =>
-            {
-                options.AddPolicy(name: "PostsPolicy", builder =>
-                {
-                    //To be changed to deployed URL
-                    builder.WithOrigins("http://localhost:3003").AllowAnyHeader().AllowAnyMethod();
-                });
-            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "SecretVaultAPI v1"));
-            }
+            app.UseDeveloperExceptionPage();
+            app.UseSwagger();
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "SecretVaultServerless v1"));
 
             app.UseHttpsRedirection();
 
             app.UseRouting();
-
-            app.UseCors();
 
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapGet("/", async context =>
+                {
+                    await context.Response.WriteAsync("Welcome to running ASP.NET Core on AWS Lambda");
+                });
             });
         }
     }

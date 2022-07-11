@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 #nullable disable
 
-namespace SecretVaultAPI.Model
+namespace SecretVaultServerless.Model
 {
     public partial class Post
     {
