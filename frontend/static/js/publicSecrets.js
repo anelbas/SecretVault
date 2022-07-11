@@ -1,78 +1,19 @@
-let posts = [{
-    username: "amy chicken licken",
-    timestamp: "Tuesday, 13:00",
-    titlePost: "Wowzers",
-    post: "heya, maaaaaaybe we should not do this",
-    privacyStatus: "partial"
-},
-{
-    username: "amy licken",
-    timestamp: "Tuesday, 13:00",
-    titlePost: "Wowzers",
-    post: "city boooyyyyyyyy, city booooooooooooy-",
-    privacyStatus: "public"
-},
-{
-    username: "amy licken",
-    timestamp: "Tuesday, 13:00",
-    titlePost: "Wowzers",
-    post: "city boooyyyyyyyy, city booooooooooooy-",
-    privacyStatus: "public"
-},{
-    username: "amy licken",
-    timestamp: "Tuesday, 13:00",
-    titlePost: "Wowzers",
-    post: "city boooyyyyyyyy, city booooooooooooy-",
-    privacyStatus: "public"
-},{
-    username: "amy licken",
-    timestamp: "Tuesday, 13:00",
-    titlePost: "Wowzers",
-    post: "city boooyyyyyyyy, city booooooooooooy-",
-    privacyStatus: "public"
-},{
-    username: "amy licken",
-    timestamp: "Tuesday, 13:00",
-    titlePost: "Wowzers",
-    post: "city boooyyyyyyyy, city booooooooooooy-",
-    privacyStatus: "public"
-},{
-    username: "amy licken",
-    timestamp: "Tuesday, 13:00",
-    titlePost: "Wowzers",
-    post: "city boooyyyyyyyy, city booooooooooooy-",
-    privacyStatus: "public"
-},{
-    username: "amy licken",
-    timestamp: "Tuesday, 13:00",
-    titlePost: "Wowzers",
-    post: "city boooyyyyyyyy, city booooooooooooy-",
-    privacyStatus: "public"
-},{
-    username: "amy licken",
-    timestamp: "Tuesday, 13:00",
-    titlePost: "Wowzers",
-    post: "city boooyyyyyyyy, city booooooooooooy-",
-    privacyStatus: "public"
-},{
-    username: "amy licken",
-    timestamp: "Tuesday, 13:00",
-    titlePost: "Wowzers",
-    post: "city boooyyyyyyyy, city booooooooooooy-",
-    privacyStatus: "public"
-}];
+let posts = [];
+let postsTitles = [];
+let currentTab;
 
-function allPosts(){
-    if (posts.length < 1)
+
+function allPosts(currentPosts){
+    
+    if (currentPosts.length < 1)
     {
         let noPosts = document.createElement("h1");
-        noPosts.innerText = "No friends bethuna"
-        // publicTab.appendChild(noPosts);
+        noPosts.innerText = "No posts to show!"
+        currentTab.appendChild(noPosts);
     }
     else {
-        posts.forEach(currentPost => {
-            let currentTab;
-            if (currentPost.privacyStatus === "public")
+        currentPosts.forEach(currentPost => {
+            if (currentPost.privacyStatus === "Public")
              currentTab = document.getElementById("tab-content-public")
             else
              currentTab = document.getElementById("tab-content-private");
@@ -80,39 +21,84 @@ function allPosts(){
             let secretsDiv = document.createElement("div");
             secretsDiv.className = "secrets";
             currentTab.appendChild(secretsDiv);
-            let username = document.createElement("p");
-            username.className = "username";
-            username.innerText = `${currentPost.username}`;
-            secretsDiv.appendChild(username);
             let timestamp = document.createElement("p");
             timestamp.className = "timestamp";
-            timestamp.innerText = `${currentPost.timestamp}`;
+            let formattedTimeStamp = formatTimeStamp(currentPost.timestamp)
+            timestamp.innerText = formattedTimeStamp;
             secretsDiv.appendChild(timestamp);
             let titlePost = document.createElement("h4");
             titlePost.className = "titlePost";
-            titlePost.innerHTML = `${currentPost.titlePost}`;
+            titlePost.innerHTML = `${currentPost.title}`;
             secretsDiv.appendChild(titlePost);
             let post = document.createElement("p");
             post.className = "post";
-            post.innerText = `${currentPost.post}`;
+            post.innerText = `${currentPost.content}`;
             secretsDiv.appendChild(post);
         });
     }
 }
 
-// function getAllPosts() {
-//     axios({
-//         method: "GET",
-//         url: "whatever",
-//         params: "whatever here"
-//     }).then((res) => {
-//         posts = res.data
-//         allPosts()
-//     }).catch((err) => {
-//         console.log("help", err);
-//     })
-// }
+function formatTimeStamp(timeStamp) {
+
+    let datePosted = new Date(Date.parse(timeStamp));
+    return datePosted.toUTCString();
+}
+
+function getAllPosts() {
+    axios({
+        method: "GET",
+        url: "https://localhost:5001/v1/Posts"
+    }).then((res) => {
+        posts = res.data
+        allPosts(posts)
+    }).catch((err) => {
+        console.log("help", err);
+    })
+}
+
+function searchPostsPrivate(){
+    var searchBar = document.getElementById("searchPostsIDPrivate").value;
+
+    if (searchBar === '')
+    {
+        clearTab();
+        getAllPosts();
+        return;
+    }
+}
+
+function searchPostsPublic() {
+    var searchBar = document.getElementById("searchPostIDPublic").value;
+
+    if (searchBar === '')
+    {
+        clearTab();
+        getAllPosts();
+        return;
+    }
+
+    postsTitles = posts.filter(post => post.title.indexOf(searchBar) > -1);
+
+    if (postsTitles.length < 1)
+    {
+        clearTab();
+        let noPosts = document.createElement("h1");
+        noPosts.innerText = "No posts to show!"
+        currentTab.appendChild(noPosts);
+    }
+    else
+    {
+        clearTab();
+        allPosts(postsTitles);
+    }
+}
+
+function clearTab(){
+    while (currentTab.lastChild.id !== 'searchPostIDPublicDiv') {
+        currentTab.removeChild(currentTab.lastChild);
+    }
+}
 
 window.onload = (event) => {
-    allPosts();
+    getAllPosts();
   };
