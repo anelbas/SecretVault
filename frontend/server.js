@@ -27,6 +27,14 @@ app.get("/newSecret", (req, res) => {
     res.sendFile(path.resolve(__dirname, "static/templates/newSecret.html"));
 });
 
+app.get("/login", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "static/templates/login.html"));
+});
+
+app.get("/signup", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "static/templates/signup.html"));
+});
+
 
 app.use(function(req,res){
     res.status(404).sendFile(path.resolve(__dirname, "static/templates/404.html"));
