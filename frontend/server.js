@@ -4,6 +4,7 @@ const http = require('http');
 const app = express();
 const server = http.createServer(app);
 const { PORT } = require("./config")
+const cors = require('cors');
 
 app.use("/static", express.static(path.resolve(__dirname, "static")));
 
@@ -16,13 +17,28 @@ app.get("/", (req, res) => {
 });
 
 app.get("/publicSecrets", (req, res) => {
+    res.header("Access-Control-Allow-Origin", "*");
     res.sendFile(path.resolve(__dirname, "static/templates/publicSecrets.html"));
+});
+
+app.get("/mySecrets", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "static/templates/mySecrets.html"));
+});
+
+app.get("/newSecret", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "static/templates/newSecret.html"));
 });
 
 
 app.use(function(req,res){
     res.status(404).sendFile(path.resolve(__dirname, "static/templates/404.html"));
 });
+
+app.use(cors({
+    origin: "*",
+    methods: ["GET", "POST"]
+  }))
+
 
 //run when the client connections
 

@@ -4,7 +4,7 @@ let currentTab;
 
 
 function allPosts(currentPosts){
-    
+
     if (currentPosts.length < 1)
     {
         let noPosts = document.createElement("h1");
@@ -65,7 +65,6 @@ function searchPostsPrivate(){
         getAllPosts();
         return;
     }
-}
 
 function searchPostsPublic() {
     var searchBar = document.getElementById("searchPostIDPublic").value;
