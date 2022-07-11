@@ -3,18 +3,17 @@ using System.Collections.Generic;
 
 #nullable disable
 
-namespace SecretVaultAPI.Model
+namespace SecretVaultServerless.Model
 {
-    public partial class User
+    public partial class PrivacyStatus
     {
-        public User()
+        public PrivacyStatus()
         {
             Posts = new HashSet<Post>();
         }
 
-        public int UserId { get; set; }
-        public string Email { get; set; }
-        public string Username { get; set; }
+        public int PrivacyStatusId { get; set; }
+        public string Status { get; set; }
 
         public virtual ICollection<Post> Posts { get; set; }
     }

@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 
 #nullable disable
 
-namespace SecretVaultAPI.Model
+namespace SecretVaultServerless.Model
 {
     public partial class SecretVaultDBContext : DbContext
     {

@@ -1,15 +1,14 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using SecretVaultAPI.DTOs;
-using SecretVaultAPI.Model;
+using SecretVaultServerless.DTOs;
+using SecretVaultServerless.Model;
 using System.Collections.Generic;
 using System.Linq;
 using System;
-using SecretVaultAPI.Utils;
-using SecretVaultAPI.Adapter;
-using Microsoft.AspNetCore.Cors;
+using SecretVaultServerless.Utils;
+using SecretVaultServerless.Adapter;
 
-namespace SecretVaultAPI.Controllers
+namespace SecretVaultServerless.Controllers
 {
     [ApiController]
     [Route("v1/[controller]")]
@@ -21,7 +20,6 @@ namespace SecretVaultAPI.Controllers
         public EncodingUtil _encodingUtil = new EncodingUtil();
         public ResponseAdapter _responseAdapter = new ResponseAdapter();
 
-        [EnableCors("PostsPolicy")]
         [HttpGet]
         public IActionResult DetailsForAllPublicPosts()
         {
@@ -41,7 +39,6 @@ namespace SecretVaultAPI.Controllers
             return Ok(postsDTO);
         }
 
-        [EnableCors("PostsPolicy")]
         [HttpGet("user/{userId}")]
         public IActionResult DetailsForAllUserPosts(int? userId)
         {
@@ -77,7 +74,6 @@ namespace SecretVaultAPI.Controllers
             return Ok(postsDTO);
         }
 
-        [EnableCors("PostsPolicy")]
         [HttpPost("user/{userId}")]
         public IActionResult SearchPostTitle(int? userId, string title)
         {
@@ -130,7 +126,6 @@ namespace SecretVaultAPI.Controllers
 
 
         // GET: Posts/Details/5
-        [DisableCors]
         [HttpGet("{id}")]
         public IActionResult Details(int? id)
         {
@@ -157,7 +152,6 @@ namespace SecretVaultAPI.Controllers
             return Ok(_responseAdapter.asDTO(postToReturn));
         }
 
-        [EnableCors("PostsPolicy")]
         //Encrypt the post
         [HttpPost]
         public IActionResult Create([FromBody] PostDTO request)
@@ -213,7 +207,6 @@ namespace SecretVaultAPI.Controllers
             return Ok(_responseAdapter.asDTO(newPost));
         }
 
-        [EnableCors("PostsPolicy")]
         //Encrypt the post
         [HttpPut("{id}")]
         public IActionResult EditPut(int? id, [FromBody] PostDTO request)
@@ -268,7 +261,6 @@ namespace SecretVaultAPI.Controllers
             return Ok(_responseAdapter.asDTO(newPost));
         }
 
-        [EnableCors("PostsPolicy")]
         [HttpPatch("{id}")]
         public IActionResult EditPatch(int? id, [FromBody] PostDTO request)
         {
@@ -317,7 +309,6 @@ namespace SecretVaultAPI.Controllers
             return Ok(_responseAdapter.asDTO(postToEdit));
         }
 
-        [EnableCors("PostsPolicy")]
         [HttpDelete("{id}")]
         public IActionResult Delete(int? id)
         {
