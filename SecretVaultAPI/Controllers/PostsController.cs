@@ -22,12 +22,20 @@ namespace SecretVaultAPI.Controllers
         public ForeignKeyObjectUtil _fkUtil = new ForeignKeyObjectUtil();
         public EncodingUtil _encodingUtil = new EncodingUtil();
         public ResponseAdapter _responseAdapter = new ResponseAdapter();
+        public AuthUtil _authUtil = new AuthUtil();
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [EnableCors("PostsPolicy")]
         [HttpGet]
         public IActionResult DetailsForAllPublicPosts()
         {
+            var authToken = _authUtil.decodeJWT(Request.Headers["Authorization"]);
+
+            if (!_authUtil.isUser(authToken, ""))
+            {
+                return Unauthorized("You do not have permission to access this data");
+            }
+
             List<Post> posts = _context.Posts.Where(item => item.PrivacyStatusId == 2).ToList();
             posts.ForEach(post => post.Content = _encodingUtil.Base64Decode(post.Content));
             List<PostDTO> postsDTO = new List<PostDTO>();
@@ -47,10 +55,10 @@ namespace SecretVaultAPI.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [EnableCors("PostsPolicy")]
         [HttpGet("user/{userId}")]
-        public IActionResult DetailsForAllUserPosts(int? userId)
+        public IActionResult DetailsForAllUserPosts(string userId)
         {
 
-            if (userId == null)
+            if (string.IsNullOrEmpty(userId))
             {
                 return BadRequest("Please provide a user id");
             }
@@ -58,6 +66,13 @@ namespace SecretVaultAPI.Controllers
             if(_context.Users.Find(userId) == null)
             {
                 return NotFound("Please provide a valid user id");
+            }
+
+            var authToken = _authUtil.decodeJWT(Request.Headers["Authorization"]);
+
+            if (!_authUtil.isUser(authToken, userId))
+            {
+                return Unauthorized("You do not have permission to access this data");
             }
 
             List<Post> posts = _context.Posts.Where(item => item.UserId == userId).ToList();
@@ -84,15 +99,22 @@ namespace SecretVaultAPI.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [EnableCors("PostsPolicy")]
         [HttpGet("user/{userId}/{title}")]
-        public IActionResult SearchPostTitle(int? userId, string title)
+        public IActionResult SearchPostTitle(string userId, string title)
         {
 
-            if (userId == null)
+            if (string.IsNullOrEmpty(userId))
             {
                 return BadRequest("Please provide a user id");
             }
 
-            if(_context.Users.Find(userId) == null)
+            var authToken = _authUtil.decodeJWT(Request.Headers["Authorization"]);
+
+            if (!_authUtil.isUser(authToken, userId))
+            {
+                return Unauthorized("You do not have permission to access this data");
+            }
+
+            if (_context.Users.Find(userId) == null)
             {
                 return NotFound("Please provide a valid user id");
             }
@@ -177,6 +199,14 @@ namespace SecretVaultAPI.Controllers
                 return BadRequest("Please enter all the valid information");
             }
 
+            string username = request.userId;
+            var authToken = _authUtil.decodeJWT(Request.Headers["Authorization"]);
+
+            if (!_authUtil.isUser(authToken, username))
+            {
+                return Unauthorized("You do not have permission to access this data");
+            }
+
             User user = _context.Users.Find(request.userId);
             if(user == null)
             {
@@ -227,9 +257,9 @@ namespace SecretVaultAPI.Controllers
             }
 
             bool validRequest = request != null;
-            validRequest |= (request.title != null);
-            validRequest |= (request.content != null);
-            validRequest |= (request.privacyStatus != null);
+            validRequest &= (request.title != null);
+            validRequest &= (request.content != null);
+            validRequest &= (request.privacyStatus != null);
 
             if (!validRequest)
             {
@@ -240,6 +270,14 @@ namespace SecretVaultAPI.Controllers
             if (postToEdit == null)
             {
                 return NotFound("Please provide a valid id");
+            }
+
+            string username = postToEdit.UserId;
+            var authToken = _authUtil.decodeJWT(Request.Headers["Authorization"]);
+
+            if (!_authUtil.isUser(authToken, username))
+            {
+                return Unauthorized("You do not have permission to access this data");
             }
 
             Post newPost = new Post();
@@ -287,7 +325,15 @@ namespace SecretVaultAPI.Controllers
                 return NotFound("Please provide a valid id");
             }
 
-            if(request == null)
+            string username = postToEdit.UserId;
+            var authToken = _authUtil.decodeJWT(Request.Headers["Authorization"]);
+
+            if (!_authUtil.isUser(authToken, username))
+            {
+                return Unauthorized("You do not have permission to access this data");
+            }
+
+            if (request == null)
             {
                 return BadRequest("Please send a valid request");
             }
@@ -332,6 +378,19 @@ namespace SecretVaultAPI.Controllers
             }
 
             Post postToDelete = _context.Posts.Find(id);
+
+            if (postToDelete == null)
+            {
+                return NotFound("Please provide a valid id");
+            }
+
+            string username = postToDelete.UserId;
+            var authToken = _authUtil.decodeJWT(Request.Headers["Authorization"]);
+
+            if (!_authUtil.isUser(authToken, username))
+            {
+                return Unauthorized("You do not have permission to access this data");
+            }
 
             try
             {
