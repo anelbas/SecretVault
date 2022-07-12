@@ -68,7 +68,7 @@ header, footer {
     border-color: rgba(255,255,255,1);
 }
 
-#username{
+#email{
     position: absolute;
     top: 30%;
     left: 50%;
