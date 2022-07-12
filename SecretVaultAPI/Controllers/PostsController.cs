@@ -24,6 +24,8 @@ namespace SecretVaultAPI.Controllers
         public ResponseAdapter _responseAdapter = new ResponseAdapter();
         public AuthUtil _authUtil = new AuthUtil();
 
+        private string key = "b14ca9275a4e412a572e2ea2315e3516";  
+
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [EnableCors("PostsPolicy")]
         [HttpGet]
@@ -37,7 +39,7 @@ namespace SecretVaultAPI.Controllers
             }
 
             List<Post> posts = _context.Posts.Where(item => item.PrivacyStatusId == 2).ToList();
-            posts.ForEach(post => post.Content = _encodingUtil.Base64Decode(post.Content));
+            posts.ForEach(post => post.Content = _encodingUtil.DecryptString(key, post.Content));
             List<PostDTO> postsDTO = new List<PostDTO>();
 
             try
@@ -75,7 +77,7 @@ namespace SecretVaultAPI.Controllers
             {
                 return Ok("No posts found for user");
             }
-            posts.ForEach(post => post.Content = _encodingUtil.Base64Decode(post.Content));
+            posts.ForEach(post => post.Content = _encodingUtil.DecryptString(key, post.Content));
 
             List<PostDTO> postsDTO = new List<PostDTO>();
 
@@ -130,7 +132,7 @@ namespace SecretVaultAPI.Controllers
                 return Ok("No posts found for title search");
             }
 
-            selectedPosts.ForEach(post => post.Content = _encodingUtil.Base64Decode(post.Content));
+            selectedPosts.ForEach(post => post.Content = _encodingUtil.DecryptString(key, post.Content));
 
             List<PostDTO> postsDTO = new List<PostDTO>();
 
@@ -163,14 +165,14 @@ namespace SecretVaultAPI.Controllers
 
             try
             {
-                postToReturn.Content = _encodingUtil.Base64Decode(postToReturn.Content);
+                postToReturn.Content = _encodingUtil.DecryptString(key, postToReturn.Content);
             }
             catch
             {
                 return StatusCode(500, "Unable to fetch post details from database.");
             }
 
-            return Ok(_responseAdapter.asDTO(postToReturn));
+            return Ok(_responseAdapter.asDetailPostDTO(postToReturn));
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
@@ -201,7 +203,7 @@ namespace SecretVaultAPI.Controllers
             Post newPost = new Post();
 
             newPost.Title = request.title;
-            newPost.Content = _encodingUtil.Base64Encode(request.content);
+            newPost.Content = _encodingUtil.EncryptString(key, request.content);
             newPost.Timestamp = DateTime.Now;
 
             PrivacyStatus privacyObject = _fkUtil.getPrivacyStatus(request.privacyStatus);
@@ -269,7 +271,7 @@ namespace SecretVaultAPI.Controllers
 
             newPost.PostId = postToEdit.PostId;
             newPost.Title = request.title;
-            newPost.Content = _encodingUtil.Base64Encode(request.content);
+            newPost.Content = _encodingUtil.EncryptString(key, request.content);
             newPost.Timestamp = DateTime.Now;
 
             try
@@ -332,7 +334,7 @@ namespace SecretVaultAPI.Controllers
             }
 
             postToEdit.Title = (request.title == null) ? postToEdit.Title : request.title;
-            postToEdit.Content = (request.content == null) ? postToEdit.Content : _encodingUtil.Base64Encode(request.content);
+            postToEdit.Content = (request.content == null) ? postToEdit.Content : _encodingUtil.EncryptString(key, request.content);
             postToEdit.Timestamp = DateTime.Now;
 
             try
