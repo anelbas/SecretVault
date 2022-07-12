@@ -51,7 +51,7 @@ Create a platform where a user can create, edit and delete secrets that they wan
 	- Application: Edit a spesific post
 	- Output: OK status
 	
--DELETE /v1/Posts/{id}
+- DELETE /v1/Posts/{id}
 	- Input: Post ID
 	- Application: Delete a spesific post
 	- Output: OK status
