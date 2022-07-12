@@ -20,13 +20,14 @@ namespace SecretVaultAPI.Controllers
         public ForeignKeyObjectUtil _fkUtil = new ForeignKeyObjectUtil();
         public EncodingUtil _encodingUtil = new EncodingUtil();
         public ResponseAdapter _responseAdapter = new ResponseAdapter();
-        private string key = "b14ca5898a4e4133bbce2ea2315a1916";  
+        
 
         [EnableCors("PostsPolicy")]
         [HttpGet]
         public IActionResult DetailsForAllPublicPosts()
         {
-            List<Post> posts = _context.Posts.Where(item => item.PrivacyStatusId == 2).ToList();
+      var key = "b14ca5898a4e4133bbce2ea2315a1916";
+      List<Post> posts = _context.Posts.Where(item => item.PrivacyStatusId == 2).ToList();
             posts.ForEach(post => post.Content = _encodingUtil.DecryptString(key, post.Content));
             List<PostDTO> postsDTO = new List<PostDTO>();
 
@@ -46,8 +47,8 @@ namespace SecretVaultAPI.Controllers
         [HttpGet("user/{userId}")]
         public IActionResult DetailsForAllUserPosts(int? userId)
         {
-
-            if (userId == null)
+      var key = "b14ca5898a4e4133bbce2ea2315a1916";
+      if (userId == null)
             {
                 return BadRequest("Please provide a user id");
             }
@@ -82,8 +83,8 @@ namespace SecretVaultAPI.Controllers
         [HttpGet("user/{userId}/{title}")]
         public IActionResult SearchPostTitle(int? userId, string title)
         {
-
-            if (userId == null)
+      var key = "b14ca5898a4e4133bbce2ea2315a1916";
+      if (userId == null)
             {
                 return BadRequest("Please provide a user id");
             }
@@ -135,7 +136,8 @@ namespace SecretVaultAPI.Controllers
         [HttpGet("{id}")]
         public IActionResult Details(int? id)
         {
-            if (id == null)
+      var key = "b14ca5898a4e4133bbce2ea2315a1916";
+      if (id == null)
             {
                 return BadRequest("Please provide an id");
             }
@@ -163,8 +165,8 @@ namespace SecretVaultAPI.Controllers
         [HttpPost]
         public IActionResult Create([FromBody] PostDTO request)
         {
-
-            bool validRequest = request != null;
+      var key = "b14ca5898a4e4133bbce2ea2315a1916";
+      bool validRequest = request != null;
             validRequest |= (request.title != null);
             validRequest |= (request.content != null);
             validRequest |= (request.privacyStatus != null);
@@ -220,7 +222,8 @@ namespace SecretVaultAPI.Controllers
         [HttpPut("{id}")]
         public IActionResult EditPut(int? id, [FromBody] PostDTO request)
         {
-            if (id == null)
+      var key = "b14ca5898a4e4133bbce2ea2315a1916";
+      if (id == null)
             {
                 return BadRequest("Please provide a valid id");
             }
@@ -274,7 +277,8 @@ namespace SecretVaultAPI.Controllers
         [HttpPatch("{id}")]
         public IActionResult EditPatch(int? id, [FromBody] PostDTO request)
         {
-            if (id == null)
+      var key = "b14ca5898a4e4133bbce2ea2315a1916";
+      if (id == null)
             {
                 return BadRequest("Please provide a valid id");
             }
