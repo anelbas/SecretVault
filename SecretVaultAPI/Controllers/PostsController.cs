@@ -8,6 +8,8 @@ using System;
 using SecretVaultAPI.Utils;
 using SecretVaultAPI.Adapter;
 using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace SecretVaultAPI.Controllers
 {
@@ -21,6 +23,7 @@ namespace SecretVaultAPI.Controllers
         public EncodingUtil _encodingUtil = new EncodingUtil();
         public ResponseAdapter _responseAdapter = new ResponseAdapter();
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [EnableCors("PostsPolicy")]
         [HttpGet]
         public IActionResult DetailsForAllPublicPosts()
@@ -41,6 +44,7 @@ namespace SecretVaultAPI.Controllers
             return Ok(postsDTO);
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [EnableCors("PostsPolicy")]
         [HttpGet("user/{userId}")]
         public IActionResult DetailsForAllUserPosts(int? userId)
@@ -77,6 +81,7 @@ namespace SecretVaultAPI.Controllers
             return Ok(postsDTO);
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [EnableCors("PostsPolicy")]
         [HttpGet("user/{userId}/{title}")]
         public IActionResult SearchPostTitle(int? userId, string title)
@@ -128,8 +133,6 @@ namespace SecretVaultAPI.Controllers
             return Ok(postsDTO);
         }
 
-
-        // GET: Posts/Details/5
         [DisableCors]
         [HttpGet("{id}")]
         public IActionResult Details(int? id)
@@ -157,8 +160,8 @@ namespace SecretVaultAPI.Controllers
             return Ok(_responseAdapter.asDTO(postToReturn));
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [EnableCors("PostsPolicy")]
-        //Encrypt the post
         [HttpPost]
         public IActionResult Create([FromBody] PostDTO request)
         {
@@ -213,8 +216,8 @@ namespace SecretVaultAPI.Controllers
             return Ok(_responseAdapter.asDTO(newPost));
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [EnableCors("PostsPolicy")]
-        //Encrypt the post
         [HttpPut("{id}")]
         public IActionResult EditPut(int? id, [FromBody] PostDTO request)
         {
@@ -268,6 +271,7 @@ namespace SecretVaultAPI.Controllers
             return Ok(_responseAdapter.asDTO(newPost));
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [EnableCors("PostsPolicy")]
         [HttpPatch("{id}")]
         public IActionResult EditPatch(int? id, [FromBody] PostDTO request)
@@ -317,6 +321,7 @@ namespace SecretVaultAPI.Controllers
             return Ok(_responseAdapter.asDTO(postToEdit));
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [EnableCors("PostsPolicy")]
         [HttpDelete("{id}")]
         public IActionResult Delete(int? id)

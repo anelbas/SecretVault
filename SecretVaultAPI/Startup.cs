@@ -13,6 +13,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using SecretVaultAPI.Model;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.IdentityModel.Tokens;
+using Newtonsoft.Json;
+using System.Net;
+using Microsoft.IdentityModel.Tokens;
 
 namespace SecretVaultAPI
 {
@@ -52,6 +57,12 @@ options.UseSqlServer(Configuration.GetConnectionString("DBConnection")));
                     builder.WithOrigins("http://localhost:3003").AllowAnyHeader().AllowAnyMethod();
                 });
             });
+
+            services.AddAuthentication()
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = GetCognitoTokenValidationParams();
+                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -72,10 +83,41 @@ options.UseSqlServer(Configuration.GetConnectionString("DBConnection")));
 
             app.UseAuthorization();
 
+            app.UseAuthentication();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
+        }
+
+        private TokenValidationParameters GetCognitoTokenValidationParams()
+        {
+            var cognitoIssuer = $"https://cognito-idp.eu-west-1.amazonaws.com/eu-west-1_wdlu0N2r0";
+
+            var jwtKeySetUrl = $"{cognitoIssuer}/.well-known/jwks.json";
+
+            var cognitoAudience = "3tdd1ci4gkbcel377hjn62am0c";
+
+            return new TokenValidationParameters
+            {
+                IssuerSigningKeyResolver = (s, securityToken, identifier, parameters) =>
+                {
+                    // get JsonWebKeySet from AWS 
+                    var json = new WebClient().DownloadString(jwtKeySetUrl);
+
+                    // serialize the result 
+                    var keys = JsonConvert.DeserializeObject<JsonWebKeySet>(json).Keys;
+
+                    // cast the result to be the type expected by IssuerSigningKeyResolver 
+                    return (IEnumerable<SecurityKey>)keys;
+                },
+                ValidIssuer = cognitoIssuer,
+                ValidateIssuerSigningKey = true,
+                ValidateIssuer = true,
+                ValidateLifetime = true,
+                ValidAudience = cognitoAudience
+            };
         }
     }
 }
