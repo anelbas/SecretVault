@@ -183,7 +183,7 @@ namespace SecretVaultAPI.Controllers
             validRequest |= (request.title != null);
             validRequest |= (request.content != null);
             validRequest |= (request.privacyStatus != null);
-            validRequest |= (request.userId != 0);
+            validRequest |= (request.userId != null);
 
             if (!validRequest)
             {
