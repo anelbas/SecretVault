@@ -1,5 +1,6 @@
 # SecretVault
-A vault for all your secrets :)
+## PROJECT SCOPE
+Create a platform where a user can create, edit and delete secrets that they want to keep track of. The users are able to make their secrets public so that other users can see them (anonymously).
 
 ## SETTING UP THE BACK-END:
 - The database is running on a CloudFormation instance so you do not have do set up anything for that. See the ERD for the   layout of the database.
