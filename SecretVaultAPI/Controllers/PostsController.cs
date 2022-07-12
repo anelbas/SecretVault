@@ -20,7 +20,7 @@ namespace SecretVaultAPI.Controllers
         public ForeignKeyObjectUtil _fkUtil = new ForeignKeyObjectUtil();
         public EncodingUtil _encodingUtil = new EncodingUtil();
         public ResponseAdapter _responseAdapter = new ResponseAdapter();
-        private string key = "b14ca5898a4e4133bbce2ea2315a1916";  
+        private string key = "b14ca9275a4e412a572e2ea2315e3516";  
 
         [EnableCors("PostsPolicy")]
         [HttpGet]
