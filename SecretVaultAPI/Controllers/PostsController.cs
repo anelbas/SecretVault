@@ -155,7 +155,7 @@ namespace SecretVaultAPI.Controllers
                 return StatusCode(500, "Unable to fetch post details from database.");
             }
 
-            return Ok(_responseAdapter.asDTO(postToReturn));
+            return Ok(_responseAdapter.asDetailPostDTO(postToReturn));
         }
 
         [EnableCors("PostsPolicy")]
