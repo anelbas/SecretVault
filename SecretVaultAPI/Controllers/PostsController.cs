@@ -63,11 +63,6 @@ namespace SecretVaultAPI.Controllers
                 return BadRequest("Please provide a user id");
             }
 
-            if(_context.Users.Find(userId) == null)
-            {
-                return NotFound("Please provide a valid user id");
-            }
-
             var authToken = _authUtil.decodeJWT(Request.Headers["Authorization"]);
 
             if (!_authUtil.isUser(authToken, userId))
@@ -76,7 +71,7 @@ namespace SecretVaultAPI.Controllers
             }
 
             List<Post> posts = _context.Posts.Where(item => item.UserId == userId).ToList();
-            if(posts.Count == 0)
+            if (posts.Count == 0)
             {
                 return Ok("No posts found for user");
             }
@@ -114,27 +109,23 @@ namespace SecretVaultAPI.Controllers
                 return Unauthorized("You do not have permission to access this data");
             }
 
-            if (_context.Users.Find(userId) == null)
-            {
-                return NotFound("Please provide a valid user id");
-            }
-
             List<Post> posts = _context.Posts.Where(item => item.UserId == userId).ToList();
-            if(posts.Count == 0)
+            if (posts.Count == 0)
             {
                 return Ok("No posts found for user");
             }
 
             List<Post> selectedPosts = new List<Post>();
-            
-            posts.ForEach(post => 
+
+            posts.ForEach(post =>
             {
-                if(post.Title.ToLower().Contains(title.ToLower())) {
+                if (post.Title.ToLower().Contains(title.ToLower()))
+                {
                     selectedPosts.Add(post);
                 }
             });
 
-            if(selectedPosts.Count == 0)
+            if (selectedPosts.Count == 0)
             {
                 return Ok("No posts found for title search");
             }
@@ -207,12 +198,6 @@ namespace SecretVaultAPI.Controllers
                 return Unauthorized("You do not have permission to access this data");
             }
 
-            User user = _context.Users.Find(request.userId);
-            if(user == null)
-            {
-                return BadRequest("Please provide a valid user id");
-            }
-
             Post newPost = new Post();
 
             newPost.Title = request.title;
@@ -221,7 +206,7 @@ namespace SecretVaultAPI.Controllers
 
             PrivacyStatus privacyObject = _fkUtil.getPrivacyStatus(request.privacyStatus);
 
-            if(privacyObject == null)
+            if (privacyObject == null)
             {
                 return BadRequest("Please enter a valid privacy status");
             }
@@ -232,8 +217,6 @@ namespace SecretVaultAPI.Controllers
                 newPost.PrivacyStatusId = privacyObject.PrivacyStatusId;
                 privacyObject.Posts.Add(newPost);
                 newPost.UserId = request.userId;
-                newPost.User = user;
-                user.Posts.Add(newPost);
 
                 _context.Posts.Update(newPost);
                 _context.SaveChanges();
@@ -296,7 +279,6 @@ namespace SecretVaultAPI.Controllers
                 privacyObject.Posts.Add(newPost);
 
                 newPost.UserId = postToEdit.UserId;
-                newPost.User = _context.Users.Find(newPost.UserId);
 
                 _context.Entry(postToEdit).CurrentValues.SetValues(newPost);
                 _context.SaveChanges();
@@ -338,7 +320,7 @@ namespace SecretVaultAPI.Controllers
                 return BadRequest("Please send a valid request");
             }
 
-            if(request.privacyStatus != null)
+            if (request.privacyStatus != null)
             {
                 PrivacyStatus privacyObject = _fkUtil.getPrivacyStatus(request.privacyStatus);
                 if (privacyObject != null)
@@ -348,7 +330,7 @@ namespace SecretVaultAPI.Controllers
                     privacyObject.Posts.Add(postToEdit);
                 }
             }
-            
+
             postToEdit.Title = (request.title == null) ? postToEdit.Title : request.title;
             postToEdit.Content = (request.content == null) ? postToEdit.Content : _encodingUtil.Base64Encode(request.content);
             postToEdit.Timestamp = DateTime.Now;
