@@ -56,7 +56,7 @@ namespace SecretVaultAPI.Controllers
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [EnableCors("PostsPolicy")]
-        [HttpGet("user/{userId}")]
+        [HttpGet("user")]
         public IActionResult DetailsForAllUserPosts(string userId)
         {
 
@@ -95,7 +95,7 @@ namespace SecretVaultAPI.Controllers
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [EnableCors("PostsPolicy")]
-        [HttpGet("user/{userId}/{title}")]
+        [HttpGet("user/search")]
         public IActionResult SearchPostTitle(string userId, string title)
         {
 
@@ -149,7 +149,7 @@ namespace SecretVaultAPI.Controllers
         }
 
         [DisableCors]
-        [HttpGet("{id}")]
+        [HttpGet("details")]
         public IActionResult Details(int? id)
         {
             if (id == null)
@@ -233,7 +233,7 @@ namespace SecretVaultAPI.Controllers
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [EnableCors("PostsPolicy")]
-        [HttpPut("{id}")]
+        [HttpPut]
         public IActionResult EditPut(int? id, [FromBody] PostDTO request)
         {
             if (id == null)
@@ -295,7 +295,7 @@ namespace SecretVaultAPI.Controllers
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [EnableCors("PostsPolicy")]
-        [HttpPatch("{id}")]
+        [HttpPatch]
         public IActionResult EditPatch(int? id, [FromBody] PostDTO request)
         {
             if (id == null)
@@ -353,7 +353,7 @@ namespace SecretVaultAPI.Controllers
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [EnableCors("PostsPolicy")]
-        [HttpDelete("{id}")]
+        [HttpDelete]
         public IActionResult Delete(int? id)
         {
             if (id == null)

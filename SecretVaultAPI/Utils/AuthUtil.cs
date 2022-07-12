@@ -7,10 +7,12 @@ namespace SecretVaultAPI.Utils
     public class AuthUtil
     {
 
-        public JwtSecurityToken decodeJWT(string jwt)
+        public JwtSecurityToken decodeJWT(string authHeader)
         {
+            string bear = "Bearer ";
+            authHeader = authHeader.Substring(bear.Length);
             var handler = new JwtSecurityTokenHandler();
-            var jsonToken = handler.ReadToken(jwt);
+            var jsonToken = handler.ReadToken(authHeader);
             var tokenS = jsonToken as JwtSecurityToken;
             return tokenS;
         }
