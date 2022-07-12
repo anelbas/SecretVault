@@ -1,8 +1,8 @@
-﻿using SecretVaultServerless.Model;
+﻿using SecretVaultAPI.Model;
 using System;
 using System.Linq;
 
-namespace SecretVaultServerless.Utils
+namespace SecretVaultAPI.Utils
 {
     public class ForeignKeyObjectUtil
     {

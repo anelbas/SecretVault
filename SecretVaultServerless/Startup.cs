@@ -11,8 +11,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using SecretVaultServerless.Model;
+using SecretVaultAPI.Model;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.IdentityModel.Tokens;
+using Newtonsoft.Json;
+using System.Net;
+using Microsoft.IdentityModel.Tokens;
 
 namespace SecretVaultServerless
 {
@@ -32,8 +37,9 @@ namespace SecretVaultServerless
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "SecretVaultServerless", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "SecretVaultAPI", Version = "v1" });
             });
+
 
             services.AddDbContext<SecretVaultDBContext>(options =>
 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
@@ -43,6 +49,21 @@ options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             });
 
             services.AddControllersWithViews();
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy(name: "PostsPolicy", builder =>
+                {
+                    //To be changed to deployed URL
+                    builder.WithOrigins("http://localhost:3003").AllowAnyHeader().AllowAnyMethod();
+                });
+            });
+
+            services.AddAuthentication()
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = GetCognitoTokenValidationParams();
+                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -56,16 +77,45 @@ options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             app.UseRouting();
 
+            app.UseCors();
+
+            app.UseAuthentication();
+
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapGet("/", async context =>
-                {
-                    await context.Response.WriteAsync("Welcome to running ASP.NET Core on AWS Lambda");
-                });
             });
+        }
+
+        private TokenValidationParameters GetCognitoTokenValidationParams()
+        {
+            var cognitoIssuer = $"https://cognito-idp.eu-west-1.amazonaws.com/eu-west-1_wdlu0N2r0";
+
+            var jwtKeySetUrl = $"{cognitoIssuer}/.well-known/jwks.json";
+
+            var cognitoAudience = "3tdd1ci4gkbcel377hjn62am0c";
+
+            return new TokenValidationParameters
+            {
+                IssuerSigningKeyResolver = (s, securityToken, identifier, parameters) =>
+                {
+                    // get JsonWebKeySet from AWS 
+                    var json = new WebClient().DownloadString(jwtKeySetUrl);
+
+                    // serialize the result 
+                    var keys = JsonConvert.DeserializeObject<JsonWebKeySet>(json).Keys;
+
+                    // cast the result to be the type expected by IssuerSigningKeyResolver 
+                    return keys as IEnumerable<SecurityKey>;
+                },
+                ValidIssuer = cognitoIssuer,
+                ValidateIssuerSigningKey = true,
+                ValidateIssuer = true,
+                ValidateLifetime = true,
+                ValidAudience = cognitoAudience
+            };
         }
     }
 }
