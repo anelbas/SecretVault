@@ -1,3 +1,5 @@
+
+
 //TODO: Call the endpoint with the validated information
 
 //Options for password strength checker
@@ -12,12 +14,9 @@ const options = {
   
 zxcvbnts.core.zxcvbnOptions.setOptions(options);
 
-let email=document.getElementById("email").value;
-let username=document.getElementById("username").value; 
-
 const meter = document.getElementById('password-strength-meter');
 const passwordStrengthText = document.getElementById('password-strength-text');
-const password = document.getElementById('password');
+
   
 function makeToast(alertText,alertX,alertY){
 	Toastify({
@@ -46,12 +45,13 @@ function isPasswordStrong(){
   
 function validateSignup(){
 
+	const email=document.getElementById("email").value;
+	const username=document.getElementById("username").value; 
+	const password = document.getElementById('password').value;
+
 	const validEmailRegEx=/^[a-zA-Z0-9_+&*-]+(?:\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,7}$/;
 
 	const validUsernameRegEx=/^[^'";:/\\ ]*$/;
-
-	email=document.getElementById("email").value;
-	username=document.getElementById("username").value; 
 
 	const isEmailValid=validEmailRegEx.test(email);
 	const isUsernameValid=validUsernameRegEx.test(username)&&username.length>=5;
@@ -70,19 +70,19 @@ function validateSignup(){
 		return;
 	}
 
-	if(!isUsernameValid){
-		const xCoordRef=document.querySelector('#username').getBoundingClientRect().left; // X
-		const yCoordRef=document.querySelector('#username ').getBoundingClientRect().top; // Y
-		const xCoordOffset=350;
-		const yCoordOffset=19;
+	// if(!isUsernameValid){
+	// 	const xCoordRef=document.querySelector('#username').getBoundingClientRect().left; // X
+	// 	const yCoordRef=document.querySelector('#username ').getBoundingClientRect().top; // Y
+	// 	const xCoordOffset=350;
+	// 	const yCoordOffset=19;
 
-		const alertText="Please enter a valid username\n\u2022 No spaces or these characters: ' ; : /\\ \"\ \n\u2022 At least 5 characters";
+	// 	const alertText="Please enter a valid username\n\u2022 No spaces or these characters: ' ; : /\\ \"\ \n\u2022 At least 5 characters";
 
-		makeToast(alertText,xCoordRef-xCoordOffset,yCoordRef-yCoordOffset);
+	// 	makeToast(alertText,xCoordRef-xCoordOffset,yCoordRef-yCoordOffset);
 
-		return;
+	// 	return;
 		
-	}
+	// }
 
 	if(!isPasswordValid){	
 		const xCoordRef=document.querySelector('#password').getBoundingClientRect().left; // X
@@ -100,6 +100,9 @@ function validateSignup(){
 	//Hide the meter and strength test if successful
 	meter.style.visibility="hidden";
 	passwordStrengthText.style.visibility="hidden";
+
+	console.log(email, password)
+	completedSignUp.completedSignUp(email, password);
 
 };
 
