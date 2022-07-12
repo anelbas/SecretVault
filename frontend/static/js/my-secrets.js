@@ -1,10 +1,10 @@
 import mySecrets from './mock_data/secrets-mock.js';
 
 const privacyObject = {
-  on: "private",
-  off: "public",
-  true: "private",
-  false: "public"
+  on: "Private",
+  off: "Public",
+  true: "Private",
+  false: "Public"
 }
 
 const getMySecrets = async (userID) => {
@@ -43,7 +43,7 @@ const createSecretCard = (id, text, privacy, userID) => {
 
   const parent = document.getElementById("my-secrets");
   const card = document.createElement("article");
-  card.className = "secrets"
+  card.className = "secrets grid-item"
 
   const content = document.createElement("p");
   const secret = document.createTextNode(text);
@@ -57,7 +57,7 @@ const createSecretCard = (id, text, privacy, userID) => {
 
   const privacyCheckbox = document.createElement("input");
   privacyCheckbox.type = "checkbox";
-  privacyCheckbox.checked = privacy === "private" ? true : false;
+  privacyCheckbox.checked = privacy === "Private" ? true : false;
 
   const privacySlider = document.createElement("span");
   privacySlider.className = "slider round";
