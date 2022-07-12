@@ -9,9 +9,9 @@ namespace SecretVaultAPI.DTOs
     private string Content;
     private DateTime? Timestamp;
     private string PrivacyStatus;
-    private int UserId;
+    private string UserId;
 
-    public DetailPostDTO(int postId, string title, string content, DateTime? timestamp, string privacyStatus, int userId)
+    public DetailPostDTO(int postId, string title, string content, DateTime? timestamp, string privacyStatus, string userId)
     {
         PostId = postId;
         Title = title;
@@ -26,6 +26,6 @@ namespace SecretVaultAPI.DTOs
     public string content { get => Content; set => Content = value; }
     public DateTime? timestamp { get => Timestamp; set => Timestamp = value; }
     public string privacyStatus { get => PrivacyStatus; set => PrivacyStatus = value; }
-    public int userId { get => UserId; set => UserId = value; }
+    public string userId { get => UserId; set => UserId = value; }
   }
 }
