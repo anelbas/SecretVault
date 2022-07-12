@@ -7,9 +7,15 @@ const { PORT } = require("./config")
 
 app.use("/static", express.static(path.resolve(__dirname, "static")));
 
+app.use("/bundle.js", express.static("bundle.js"))
+
 app.use('/favicon.ico', express.static('static/images/friender.ico'));
 
 app.use('/config.js', express.static('config.js'));
+
+app.use('/userpool.js', express.static("userpool.js"));
+
+app.use('/amazon-cognito-identity.min.js', express.static('amazon-cognito-identity.min.js'));
 
 app.get("/", (req, res) => {
     res.sendFile(path.resolve(__dirname, "public/index.html"));
