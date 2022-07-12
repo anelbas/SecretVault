@@ -18,11 +18,13 @@ using System.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using System.Net;
 using Microsoft.IdentityModel.Tokens;
+using SecretVaultAPI.Utils;
 
 namespace SecretVaultAPI
 {
     public class Startup
     {
+        SecretsManager _dbUtil = new SecretsManager();
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -40,14 +42,17 @@ namespace SecretVaultAPI
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "SecretVaultAPI", Version = "v1" });
             });
 
+            string connectionString = SecretsManager.GetSecret();
+
             services.AddDbContext<SecretVaultDBContext>(options =>
-options.UseSqlServer(Configuration.GetConnectionString("DBConnection")));
+options.UseSqlServer(Configuration.GetConnectionString(connectionString)));
             services.AddSession(options =>
             {
                 options.IdleTimeout = TimeSpan.FromMinutes(30);
             });
 
             services.AddControllersWithViews();
+            services.AddSingleton<IConfigSettings, ConfigSettings>();
 
             services.AddCors(options =>
             {

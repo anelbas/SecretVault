@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 #nullable disable
 
-namespace SecretVaultServerless.Model
+namespace SecretVaultAPI.Model
 {
     public partial class PrivacyStatus
     {
