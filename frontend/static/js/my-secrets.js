@@ -1,22 +1,29 @@
 import mySecrets from './mock_data/secrets-mock.js';
 
-const getMySecrets = (userID) => {
-  
-  // axios({
-  //   method: "GET",
-  //   headers: {},
-  //   url: `http://ec2-3-82-51-192.compute-1.amazonaws.com:3002/api/my-secrets/${id}`
-  // }).then((data) => {
-  //   console.log(data);
-  //   sessionStorage.setItem("--my-secrets", data.data);
-  //   return data.data;
-  // });
-  return mySecrets().data;
+const privacyObject = {
+  on: "private",
+  off: "public",
+  true: "private",
+  false: "public"
+}
+
+const getMySecrets = async (userID) => {
+
+  return await axios({
+    method: "GET",
+    url: `https://localhost:5001/v1/Posts/user/${userID}`
+  }).then((res) => {
+    console.log(res.data);
+    return res.data
+  }).catch((err) => {
+    console.log("Unable to get your secrets", err);
+    return [];
+  });
 };
 
-const createSecretsTable = (userID) => {
+const createSecretsTable = async (userID) => {
 
-  const secrets = sessionStorage.getItem('--my-secrets') || getMySecrets(userID);
+  const secrets = await getMySecrets(userID);
 
   console.log('secrets', secrets);
 
@@ -24,63 +31,130 @@ const createSecretsTable = (userID) => {
 
     console.table('secret', secrets[i]);
 
-    const id = secrets[i].id;
-    const text = secrets[i].secret;
-    const privacy = secrets[i].privacy;
+    const id = secrets[i].postId;
+    const text = secrets[i].content;
+    const privacy = secrets[i].privacyStatus;
 
-    createSecretRow(id, text, privacy);
+    createSecretCard(id, text, privacy, userID);
   }
 };
 
-const createSecretRow = (id, text, privacy) => {
+const createSecretCard = (id, text, privacy, userID) => {
 
-  const parent = document.getElementById("secrets-body");
-  const row = document.createElement("tr");
+  const parent = document.getElementById("my-secrets");
+  const card = document.createElement("article");
+  card.className = "secrets"
 
-  const secretColumn = document.createElement("td");
+  const content = document.createElement("p");
   const secret = document.createTextNode(text);
-  secretColumn.appendChild(secret);
+  content.appendChild(secret);
 
-  const privacyColumn = document.createElement("td");
+  const privacyStatus = document.createElement("section");
+  privacyStatus.className = "privacy-toggle"
 
-  const privateLabel = document.createElement("label");
-  privateLabel.setAttribute("for", "private");
-  const privateText = document.createTextNode("private");
-  privateLabel.appendChild(privateText);
+  const privacyToggle = document.createElement("label");
+  privacyToggle.className = "switch";
 
-  const privateRadioButton = document.createElement("input");
-  privateRadioButton.setAttribute("type", "radio");
-  privateRadioButton.setAttribute("id", "private");
-  privateRadioButton.setAttribute("name", `${id}`);
-  privateRadioButton.setAttribute("value", "private");
+  const privacyCheckbox = document.createElement("input");
+  privacyCheckbox.type = "checkbox";
+  privacyCheckbox.checked = privacy === "private" ? true : false;
 
+  const privacySlider = document.createElement("span");
+  privacySlider.className = "slider round";
+  privacySlider.onclick = () => {
+    privacyToggle.value = !privacyToggle.value;
+    console.log(privacyToggle.value);
+    axios({
+      method: "PUT",
+      url: `https://localhost:5001/v1/Posts/${id}`,
+      data: {
+        title: text,
+        content: text,
+        timestamp: "2022-07-12T01:22:12.8576588+02:00",
+        privacyStatus: privacyObject[privacyToggle.value],
+        userId: userID
+      }
+    }).then((res) => {
+      console.log(res.data);
+      return res.data
+    }).catch((err) => {
+      console.log("Unable to get your secrets", err);
+      return [];
+    });
+  }
 
-  const publicLabel = document.createElement("label");
-  publicLabel.setAttribute("for", "public");
-  const publicText = document.createTextNode("public");
-  publicLabel.appendChild(publicText);
+  privacyToggle.appendChild(privacyCheckbox);
+  privacyToggle.appendChild(privacySlider);
   
-  const publicRadioButton = document.createElement("input");
-  publicRadioButton.setAttribute("type", "radio");
-  publicRadioButton.setAttribute("id", "public");
-  publicRadioButton.setAttribute("name", `${id}`);
-  publicRadioButton.setAttribute("value", "public");
+  const privacyLabel = document.createElement("label");
+  privacyLabel.className = "std-margin";
+  const privacyText = document.createTextNode("Private");
+  privacyLabel.appendChild(privacyText);
 
-  privacyColumn.appendChild(privateLabel);
-  privacyColumn.appendChild(privateRadioButton);
-  privacyColumn.appendChild(publicLabel);
-  privacyColumn.appendChild(publicRadioButton);
+  privacyStatus.appendChild(privacyToggle);
+  privacyStatus.appendChild(privacyLabel);
 
-  privacy === "private" ? privateRadioButton.checked = true : publicRadioButton.checked = true;
+  card.appendChild(content);
+  card.appendChild(privacyStatus);
 
-  row.appendChild(secretColumn);
-  row.appendChild(privacyColumn);
-
-  parent.appendChild(row);
+  parent.appendChild(card);
 };
 
-document.getElementById("secrets-body").onload=createSecretsTable('userId');
+function createNewSecret(userID) {
 
-// modules.exports = {
-//   createSecretsTable
-// }
+  const section = document.getElementById('new-secrets-section');
+  const secret = document.getElementById('new-secret-content');
+  const privacyStatus = document.getElementById('new-secret-privacy');
+
+  if (section?.offsetParent === null || secret?.value === '' || secret?.value === null) {
+    console.log("abort");
+    return;
+  }
+
+  console.log("secret", secret.value);
+  console.log("privacy", privacyStatus.value);
+  console.log(new Date().toUTCString());
+
+  axios({
+    method: "POST",
+    url: `https://localhost:5001/v1/Posts`,
+    data: {
+      title: secret.value,
+      content: secret.value,
+      timestamp: "2022-07-12T01:22:12.8576588+02:00",
+      privacyStatus: privacyObject[privacyStatus.value],
+      userId: userID
+    }
+  }).then((res) => {
+    const posts = res.data
+  }).catch((err) => {
+    console.log("Server error", err);
+  });
+
+  section.style.display = "none";
+  secret.value = null;
+  privacyStatus.value = "on";
+}
+
+window.onload = (event) => {
+
+  document.getElementById("submit").addEventListener('click', () => {
+    createNewSecret(1);
+  });
+  
+  document.getElementById("cancel").addEventListener('click', () => {
+    const section = document.getElementById('new-secrets-section');
+    const secret = document.getElementById('new-secret-content');
+    const privacyStatus = document.getElementById('new-secret-privacy');
+    section.style.display = "none";
+    secret.value = null;
+    privacyStatus.value = "on";
+  });
+
+  document.getElementById("add").addEventListener('click', () => {
+    const section = document.getElementById('new-secrets-section');
+    section.style.display = "block";
+  });
+};
+
+document.getElementById("my-secrets").onload = createSecretsTable(1);
