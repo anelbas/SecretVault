@@ -1,3 +1,5 @@
+
+
 let posts = [];
 let postsTitles = [];
 let currentTab;
@@ -38,6 +40,10 @@ function allPosts(currentPosts){
     }
 }
 
+function manageSecrets(){
+    window.location.href = '/mySecrets';
+}
+
 function formatTimeStamp(timeStamp) {
 
     let datePosted = new Date(Date.parse(timeStamp));
@@ -45,9 +51,15 @@ function formatTimeStamp(timeStamp) {
 }
 
 function getAllPosts() {
+    let token = getCookie.getCookie();
     axios({
         method: "GET",
-        url: "https://localhost:5001/v1/Posts"
+        url: "https://localhost:63153/v1/Posts",
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        }
     }).then((res) => {
         posts = res.data
         allPosts(posts)
@@ -90,6 +102,17 @@ function searchPostsPublic() {
     {
         clearTab();
         allPosts(postsTitles);
+    }
+}
+
+function searchPostsPrivate() {
+    var searchBar = document.getElementById("searchPostsIDPrivate").value;
+
+    if (searchBar = '')
+    {
+        clearTab();
+        getAllPosts();
+        return;
     }
 }
 
