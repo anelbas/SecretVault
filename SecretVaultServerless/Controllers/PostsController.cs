@@ -22,21 +22,13 @@ namespace SecretVaultAPI.Controllers
         public ForeignKeyObjectUtil _fkUtil = new ForeignKeyObjectUtil();
         public EncodingUtil _encodingUtil = new EncodingUtil();
         public ResponseAdapter _responseAdapter = new ResponseAdapter();
-        public AuthUtil _authUtil = new AuthUtil();
 
         private string key = "b14ca9275a4e412a572e2ea2315e3516";
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [EnableCors("PostsPolicy")]
         [HttpGet]
         public IActionResult DetailsForAllPublicPosts()
         {
-            var authToken = _authUtil.decodeJWT(Request.Headers["Authorization"]);
-
-            if (!_authUtil.isUser(authToken, ""))
-            {
-                return Unauthorized("You do not have permission to access this data");
-            }
 
             List<Post> posts = _context.Posts.Where(item => item.PrivacyStatusId == 2).ToList();
             posts.ForEach(post => post.Content = _encodingUtil.DecryptString(key, post.Content));
@@ -54,7 +46,6 @@ namespace SecretVaultAPI.Controllers
             return Ok(postsDTO);
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [EnableCors("PostsPolicy")]
         [HttpGet("user")]
         public IActionResult DetailsForAllUserPosts(string userId)
@@ -63,13 +54,6 @@ namespace SecretVaultAPI.Controllers
             if (string.IsNullOrEmpty(userId))
             {
                 return BadRequest("Please provide a user id");
-            }
-
-            var authToken = _authUtil.decodeJWT(Request.Headers["Authorization"]);
-
-            if (!_authUtil.isUser(authToken, userId))
-            {
-                return Unauthorized("You do not have permission to access this data");
             }
 
             List<Post> posts = _context.Posts.Where(item => item.UserId == userId).ToList();
@@ -93,7 +77,6 @@ namespace SecretVaultAPI.Controllers
             return Ok(postsDTO);
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [EnableCors("PostsPolicy")]
         [HttpGet("user/search")]
         public IActionResult SearchPostTitle(string userId, string title)
@@ -102,13 +85,6 @@ namespace SecretVaultAPI.Controllers
             if (string.IsNullOrEmpty(userId))
             {
                 return BadRequest("Please provide a user id");
-            }
-
-            var authToken = _authUtil.decodeJWT(Request.Headers["Authorization"]);
-
-            if (!_authUtil.isUser(authToken, userId))
-            {
-                return Unauthorized("You do not have permission to access this data");
             }
 
             List<Post> posts = _context.Posts.Where(item => item.UserId == userId).ToList();
@@ -150,6 +126,7 @@ namespace SecretVaultAPI.Controllers
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [EnableCors("PostsPolicy")]
+
         [HttpGet("details")]
         public IActionResult Details(int? id)
         {
@@ -176,7 +153,7 @@ namespace SecretVaultAPI.Controllers
             return Ok(_responseAdapter.asDetailPostDTO(postToReturn));
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        
         [EnableCors("PostsPolicy")]
         [HttpPost]
         public IActionResult Create([FromBody] PostDTO request)
@@ -194,13 +171,6 @@ namespace SecretVaultAPI.Controllers
             }
 
             string username = request.userId;
-            var authToken = _authUtil.decodeJWT(Request.Headers["Authorization"]);
-
-            if (!_authUtil.isUser(authToken, username))
-            {
-                return Unauthorized("You do not have permission to access this data");
-            }
-
             Post newPost = new Post();
 
             newPost.Title = request.title;
@@ -232,7 +202,7 @@ namespace SecretVaultAPI.Controllers
             return Ok(_responseAdapter.asDTO(newPost));
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        
         [EnableCors("PostsPolicy")]
         [HttpPut]
         public IActionResult EditPut(int? id, [FromBody] PostDTO request)
@@ -259,12 +229,7 @@ namespace SecretVaultAPI.Controllers
             }
 
             string username = postToEdit.UserId;
-            var authToken = _authUtil.decodeJWT(Request.Headers["Authorization"]);
 
-            if (!_authUtil.isUser(authToken, username))
-            {
-                return Unauthorized("You do not have permission to access this data");
-            }
 
             Post newPost = new Post();
 
@@ -294,7 +259,7 @@ namespace SecretVaultAPI.Controllers
             return Ok(_responseAdapter.asDTO(newPost));
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        
         [EnableCors("PostsPolicy")]
         [HttpPatch]
         public IActionResult EditPatch(int? id, [FromBody] PostDTO request)
@@ -311,12 +276,7 @@ namespace SecretVaultAPI.Controllers
             }
 
             string username = postToEdit.UserId;
-            var authToken = _authUtil.decodeJWT(Request.Headers["Authorization"]);
 
-            if (!_authUtil.isUser(authToken, username))
-            {
-                return Unauthorized("You do not have permission to access this data");
-            }
 
             if (request == null)
             {
@@ -352,7 +312,7 @@ namespace SecretVaultAPI.Controllers
             return Ok(_responseAdapter.asDTO(postToEdit));
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        
         [EnableCors("PostsPolicy")]
         [HttpDelete]
         public IActionResult Delete(int? id)
@@ -370,12 +330,7 @@ namespace SecretVaultAPI.Controllers
             }
 
             string username = postToDelete.UserId;
-            var authToken = _authUtil.decodeJWT(Request.Headers["Authorization"]);
 
-            if (!_authUtil.isUser(authToken, username))
-            {
-                return Unauthorized("You do not have permission to access this data");
-            }
 
             try
             {
