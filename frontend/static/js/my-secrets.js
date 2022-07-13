@@ -15,7 +15,7 @@ const getMySecrets = async (userID) => {
 
   return await axios({
     method: "GET",
-    url: `https://localhost:63153/v1/Posts/user?userId=${userID}`,
+    url: `https://localhost:44391/v1/Posts/user?userId=${userID}`,
     headers: {
       "Accept": "application/json",
       "Content-Type": "application/json",
@@ -74,11 +74,9 @@ const createSecretCard = (id, text, privacy, userID) => {
   const privacySlider = document.createElement("span");
   privacySlider.className = "slider round";
   privacySlider.onclick = () => {
-    privacyToggle.value = !privacyToggle.value;
-    console.log(privacyToggle.value);
     axios({
       method: "PUT",
-      url: `https://localhost:63153/v1/Posts?id=${id}`,
+      url: `https://localhost:44391/v1/Posts?id=${id}`,
       headers: {
         "Accept": "application/json",
         "Content-Type": "application/json",
@@ -88,15 +86,18 @@ const createSecretCard = (id, text, privacy, userID) => {
       data: {
         title: text,
         content: text,
-        timestamp: "2022-07-12T01:22:12.8576588+02:00",
-        privacyStatus: privacyObject[privacyToggle.value],
+        timestamp: new Date().toISOString(),
+        privacyStatus: privacyObject[privacy === "Private" ? 'off' : 'on'],
         userId: userID
+      },
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
       }
     }).then((res) => {
-      console.log(res.data);
       return res.data
     }).catch((err) => {
-      console.log("Unable to get your secrets", err);
       return [];
     });
   }
@@ -135,7 +136,7 @@ function createNewSecret(userID) {
 
   axios({
     method: "POST",
-    url: `https://localhost:63153/v1/Posts`,
+    url: `https://localhost:44391/v1/Posts`,
     headers: {
       "Accept": "application/json",
       "Content-Type": "application/json",

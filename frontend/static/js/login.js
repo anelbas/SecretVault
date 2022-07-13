@@ -75,7 +75,25 @@ function authenticateLogin(){
         return;
     }
 
-    completedSignIn.completedSignIn(email,password);
+    completedSignIn.completedSignIn(email,password).then((res) => {
+        try {
+			if (res.status == 200)
+			{
+				swal({title: "Nice!",
+				text: "Hello fellow... secret person!",
+				icon: "success",
+				button: true}).then((value) => {
+					window.location.href = "/mySecrets"
+				  });
+			}
+			else
+			{
+				swal("Oh no :(!", res.message, "error")
+			}
+		} catch (error) {
+			console.log("error");
+		}
+    });
 
 };
 
