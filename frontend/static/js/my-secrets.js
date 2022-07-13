@@ -16,11 +16,12 @@ const getMySecrets = async (userID) => {
     headers: {
       "Accept": "application/json",
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`
+      "Authorization": `Bearer ${token}`,
+      "Access-Control-Allow-Origin": "*"
   }
   }).then((res) => {
     console.log(res.data);
-    return res.data
+    return res.data;
   }).catch((err) => {
     console.log("Unable to get your secrets", err);
     return [];
@@ -30,8 +31,6 @@ const getMySecrets = async (userID) => {
 const createSecretsTable = async (userID) => {
 
   const secrets = await getMySecrets(userID);
-
-  console.log('secrets', secrets);
 
   if(!Array.isArray(secrets)) {
     const errorCard = document.getElementById('secrets-error');
@@ -62,6 +61,7 @@ const createSecretCard = (id, text, privacy, userID) => {
   card.className = "secrets grid-item"
 
   const content = document.createElement("p");
+  content.className = 'textClass';
   const secret = document.createTextNode(text);
   content.appendChild(secret);
 
@@ -83,6 +83,12 @@ const createSecretCard = (id, text, privacy, userID) => {
     axios({
       method: "PUT",
       url: `https://localhost:63153/v1/Posts?id=${id}`,
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+        "Access-Control-Allow-Origin": "*"
+    },
       data: {
         title: text,
         content: text,
@@ -139,6 +145,12 @@ function createNewSecret(userID) {
   axios({
     method: "POST",
     url: `https://localhost:63153/v1/Posts`,
+    headers: {
+      "Accept": "application/json",
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+      "Access-Control-Allow-Origin": "*"
+  },
     data: {
       title: secret.value,
       content: secret.value,
@@ -163,10 +175,20 @@ function createNewSecret(userID) {
   privacyStatus.value = "on";
 }
 
+// function publicSecrets(){
+//   window.location.href = "/publicSecrets";
+// }
+
 window.onload = (event) => {
 
+  document.getElementById("publicSecrets").addEventListener('click', () => {
+    window.location.href = "/publicSecrets";
+  })
+
+  document.getElementById("my-secrets").onload = createSecretsTable(username);
+
   document.getElementById("submit").addEventListener('click', () => {
-    createNewSecret(1);
+    createNewSecret(username);
   });
   
   document.getElementById("cancel").addEventListener('click', () => {
@@ -183,5 +205,3 @@ window.onload = (event) => {
     section.style.display = "block";
   });
 };
-
-document.getElementById("my-secrets").onload = createSecretsTable(username);

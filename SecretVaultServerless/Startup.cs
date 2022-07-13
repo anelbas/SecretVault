@@ -58,12 +58,6 @@ options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
                     builder.WithOrigins("http://localhost:3003").AllowAnyHeader().AllowAnyMethod();
                 });
             });
-
-            services.AddAuthentication()
-                .AddJwtBearer(options =>
-                {
-                    options.TokenValidationParameters = GetCognitoTokenValidationParams();
-                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -79,43 +73,12 @@ options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             app.UseCors();
 
-            app.UseAuthentication();
-
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
-        }
-
-        private TokenValidationParameters GetCognitoTokenValidationParams()
-        {
-            var cognitoIssuer = $"https://cognito-idp.eu-west-1.amazonaws.com/eu-west-1_eYPZ6wtks";
-
-            var jwtKeySetUrl = $"{cognitoIssuer}/.well-known/jwks.json";
-
-            var cognitoAudience = "4apfe9mjbkqm6jd1lvbfhipfs8";
-
-            return new TokenValidationParameters
-            {
-                IssuerSigningKeyResolver = (s, securityToken, identifier, parameters) =>
-                {
-                    // get JsonWebKeySet from AWS 
-                    var json = new WebClient().DownloadString(jwtKeySetUrl);
-
-                    // serialize the result 
-                    var keys = JsonConvert.DeserializeObject<JsonWebKeySet>(json).Keys;
-
-                    // cast the result to be the type expected by IssuerSigningKeyResolver 
-                    return keys as IEnumerable<SecurityKey>;
-                },
-                ValidIssuer = cognitoIssuer,
-                ValidateIssuerSigningKey = true,
-                ValidateIssuer = true,
-                ValidateLifetime = true,
-                ValidAudience = cognitoAudience
-            };
         }
     }
 }

@@ -18,13 +18,11 @@ using System.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using System.Net;
 using Microsoft.IdentityModel.Tokens;
-using SecretVaultAPI.Utils;
 
 namespace SecretVaultAPI
 {
     public class Startup
     {
-        SecretsManager _dbUtil = new SecretsManager();
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -42,17 +40,14 @@ namespace SecretVaultAPI
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "SecretVaultAPI", Version = "v1" });
             });
 
-            string connectionString = SecretsManager.GetSecret();
-
             services.AddDbContext<SecretVaultDBContext>(options =>
-options.UseSqlServer(Configuration.GetConnectionString(connectionString)));
+options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddSession(options =>
             {
                 options.IdleTimeout = TimeSpan.FromMinutes(30);
             });
 
             services.AddControllersWithViews();
-            services.AddSingleton<IConfigSettings, ConfigSettings>();
 
             services.AddCors(options =>
             {
@@ -73,6 +68,7 @@ options.UseSqlServer(Configuration.GetConnectionString(connectionString)));
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -98,11 +94,11 @@ options.UseSqlServer(Configuration.GetConnectionString(connectionString)));
 
         private TokenValidationParameters GetCognitoTokenValidationParams()
         {
-            var cognitoIssuer = $"https://cognito-idp.eu-west-1.amazonaws.com/eu-west-1_wdlu0N2r0";
+            string appClientId = this.Configuration.GetSection("UserPool")["AppClientId"];
+            string jwtKeySetUrl = this.Configuration.GetSection("UserPool")["UserPoolAuth"];
+            var cognitoIssuer = this.Configuration.GetSection("UserPool")["cognitoIssuer"];
 
-            var jwtKeySetUrl = $"{cognitoIssuer}/.well-known/jwks.json";
-
-            var cognitoAudience = "3tdd1ci4gkbcel377hjn62am0c";
+            var cognitoAudience = appClientId;
 
             return new TokenValidationParameters
             {
