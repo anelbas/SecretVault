@@ -148,7 +148,8 @@ namespace SecretVaultAPI.Controllers
             return Ok(postsDTO);
         }
 
-        [DisableCors]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [EnableCors("PostsPolicy")]
         [HttpGet("details")]
         public IActionResult Details(int? id)
         {

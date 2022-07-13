@@ -40,6 +40,10 @@ function allPosts(currentPosts){
     }
 }
 
+function manageSecrets(){
+    window.location.href = '/mySecrets';
+}
+
 function formatTimeStamp(timeStamp) {
 
     let datePosted = new Date(Date.parse(timeStamp));
@@ -98,6 +102,17 @@ function searchPostsPublic() {
     {
         clearTab();
         allPosts(postsTitles);
+    }
+}
+
+function searchPostsPrivate() {
+    var searchBar = document.getElementById("searchPostsIDPrivate").value;
+
+    if (searchBar = '')
+    {
+        clearTab();
+        getAllPosts();
+        return;
     }
 }
 
