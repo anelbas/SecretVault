@@ -47,18 +47,24 @@ const createSecretsTable = async (userID) => {
     console.table('secret', secrets[i]);
 
     const id = secrets[i].postId;
+    const title = secrets[i].title;
     const text = secrets[i].content;
     const privacy = secrets[i].privacyStatus;
 
-    createSecretCard(id, text, privacy, userID);
+    createSecretCard(id, title, text, privacy, userID);
   }
 };
 
-const createSecretCard = (id, text, privacy, userID) => {
+const createSecretCard = (id, title, text, privacy, userID) => {
 
   const parent = document.getElementById("my-secrets");
   const card = document.createElement("article");
   card.className = "secrets grid-item"
+
+  const cardTitle = document.createElement("p");
+  cardTitle.className = 'textClass textTitle';
+  const titleText = document.createTextNode(title);
+  cardTitle.appendChild(titleText);
 
   const content = document.createElement("p");
   content.className = 'textClass';
@@ -121,6 +127,7 @@ const createSecretCard = (id, text, privacy, userID) => {
   privacyStatus.appendChild(privacyToggle);
   privacyStatus.appendChild(privacyLabel);
 
+  card.appendChild(cardTitle);
   card.appendChild(content);
   card.appendChild(privacyStatus);
 
@@ -130,17 +137,16 @@ const createSecretCard = (id, text, privacy, userID) => {
 function createNewSecret(userID) {
 
   const section = document.getElementById('new-secrets-section');
+  const secretTitle = document.getElementById('new-secret-title');
   const secret = document.getElementById('new-secret-content');
   const privacyStatus = document.getElementById('new-secret-privacy');
 
-  if (section?.offsetParent === null || secret?.value === '' || secret?.value === null) {
-    console.log("abort");
+  if (
+    section?.offsetParent === null || secret?.value === '' || secret?.value === null
+    || secretTitle?.value === '' || secretTitle?.value === null
+  ) {
     return;
   }
-
-  console.log("secret", secret.value);
-  console.log("privacy", privacyStatus.value);
-  console.log(new Date().toUTCString());
 
   axios({
     method: "POST",
@@ -152,9 +158,9 @@ function createNewSecret(userID) {
       "Access-Control-Allow-Origin": "*"
   },
     data: {
-      title: secret.value,
+      title: secretTitle.value,
       content: secret.value,
-      timestamp: "2022-07-12T01:22:12.8576588+02:00",
+      timestamp: new Date().toISOString(),
       privacyStatus: privacyObject[privacyStatus.value],
       userId: userID
     },
@@ -174,10 +180,6 @@ function createNewSecret(userID) {
   secret.value = null;
   privacyStatus.value = "on";
 }
-
-// function publicSecrets(){
-//   window.location.href = "/publicSecrets";
-// }
 
 window.onload = (event) => {
 
