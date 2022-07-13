@@ -9,11 +9,12 @@ Create a platform where a user can create, edit and delete secrets that they wan
 - In the terminal you will get a message saying on which port it is running
 - Navigate to that port to see the front-end locally (localhost:portNumber)
 
-- To see the hosted front-end go to: 
+- To see the hosted front-end go to: https://ec2-13-246-58-156.af-south-1.compute.amazonaws.com/
 - Extra documentation for the front-end can be found in github
 
 # SETTING UP THE BACK-END:
-- The database is running on a CloudFormation instance so you do not have do set up anything for that. See the ERD for the   layout of the database.
+- The database is running on a CloudFormation instance so you do not have do set up anything for that. See the ERD for the layout of the database.
+- The link to the hosted API (not much to see there but here it is): https://bwjbt1ijm4.execute-api.eu-west-1.amazonaws.com/Prod
 - The API is hosted on API Gateway but can be run locally by following these steps:
 	- Clone the main branch on this repo to an appropriate folder
 	- Ask one of the team members to send you the appsettings.json file
@@ -36,7 +37,7 @@ Create a platform where a user can create, edit and delete secrets that they wan
 - GET /v1/Post/user/search : Get all user posts containing a certain string in the title
 - GET /v1/Post/details : Get the details of a certain post
 
-# AWS Technologies uses:
+## AWS Technologies uses:
 - Database hosted on CloudFormation instance
 - API hosted on API Gateway instance
 - Front-end hosted on EC2 instance
@@ -44,7 +45,7 @@ Create a platform where a user can create, edit and delete secrets that they wan
 - User pools in union with cognito
 - Trying to use KSM for sensitive information instead of storing it in the code but we shall see what the time limit does to us
 
-# Extra need-to-knows:
-- Please ask for special accistance if you want to run tests through postman becuase you will need to set the header properly and add a token.
+## Extra need-to-knows:
+- Please ask for special accistance if you want to run tests through postman because you will need to set the header properly and add a token (Aaron & Mika are the go to people for that I would say).
 - You do not have to run the back- & front-end in a specific order, just make sure both are running while you are testing.
 - Please be kind.
