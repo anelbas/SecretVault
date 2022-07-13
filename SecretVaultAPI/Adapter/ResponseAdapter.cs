@@ -13,5 +13,12 @@ namespace SecretVaultAPI.Adapter
             PostDTO dtoTOReturn = new PostDTO(postToReturn.Title, postToReturn.Content, postToReturn.Timestamp, privacy, postToReturn.UserId);
             return dtoTOReturn;
         }
+
+        public DetailPostDTO asDetailPostDTO(Post postToReturn)
+        {
+            string privacy = _context.PrivacyStatuses.Where(priv => priv.PrivacyStatusId == postToReturn.PrivacyStatusId).ToList().First().Status;
+            DetailPostDTO dtoTOReturn = new DetailPostDTO(postToReturn.PostId, postToReturn.Title, postToReturn.Content, postToReturn.Timestamp, privacy, postToReturn.UserId);
+            return dtoTOReturn;
+        }
     }
 }
