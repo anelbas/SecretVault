@@ -9,6 +9,9 @@
         <script src="https://cdn.jsdelivr.net/npm/@zxcvbn-ts/core@2.0.0/dist/zxcvbn-ts.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/@zxcvbn-ts/language-common@2.0.0/dist/zxcvbn-ts.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/@zxcvbn-ts/language-en@2.0.0/dist/zxcvbn-ts.js"></script>
+
+        
+        <!-- <script src="../../UserPool.js"></script> -->
       </head>
       <body>
     </head>
@@ -21,20 +24,19 @@
         <section>
             <!-- <h1>Sign Up</h1> -->
             <input type="email" id="email" placeholder="Email Address" >
-            <input type="text" id="username" placeholder="Username" >
             <input type="password" id="password" placeholder="Password" >
             <meter max="4" id="password-strength-meter"></meter>
             <p id="password-strength-text"></p>
             <button id="signup-btn" onclick="validateSignup()">Sign Up</button>
+            <button id="back-btn" onclick="goBack()">Back to home page</button>
         </section>
         
 
     <footer></footer>
     </body>
-
-        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-        <script src="../static/js/index.js"></script>
         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+        <script type="module" src="../../userpool.js"></script>
+        <script src="../static/js/signUpBundle.js"></script>
+        <script></script>
         <script src="../static/js/signup.js"></script>
-
     </html>

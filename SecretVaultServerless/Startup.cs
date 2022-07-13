@@ -80,6 +80,5 @@ options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
                 endpoints.MapControllers();
             });
         }
-
     }
 }
