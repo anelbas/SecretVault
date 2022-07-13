@@ -1,5 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300&family=Luckiest+Guy&display=swap');
 
+:root {
+    --grey: #595959;
+    --light-grey: #7d7d7d;
+  }
+  
+
 body {
     background-color: #E4DCCF;
     background-blend-mode: darken;
@@ -107,9 +113,15 @@ header, footer {
     background-color: #F0EBE3;
     font-family: 'Abhaya Libre', sans-serif;
     font-weight: 700;
-    color:#FFFFFF;
+    color:var(--grey);
     font-size: 1em;
 }
+
+#email::placeholder{
+    color: var(--light-grey);
+}
+
+
 
 #password{
     position: absolute;
@@ -125,11 +137,21 @@ header, footer {
     background-color: #F0EBE3;
     font-family: 'Abhaya Libre', sans-serif;
     font-weight: 700;
-    color:#FFFFFF;
+    color:var(--grey);
     font-size: 1em;
 }
+
+#password::placeholder{
+    color: var(--light-grey);
+  }
 
 #lockimage {
     margin-top: 80vh;
     opacity: 20%;
+}
+
+.alert{
+    background-color: #f78783;
+    font-family: 'Abhaya Libre', sans-serif;
+    color: #FFFFFF;
 }
