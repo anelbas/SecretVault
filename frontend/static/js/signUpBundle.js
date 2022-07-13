@@ -3,7 +3,7 @@ const { CognitoUserPool} = require('amazon-cognito-identity-js');
 const {CLIENTID, USER_POOL_ID} = require('../config')
 
 
-module.exports.completedSignUp = (email, password) => {
+module.exports.completedSignUp = async (email, password) => {
 
 	let cognito = {
         UserPoolId: USER_POOL_ID,
@@ -11,15 +11,23 @@ module.exports.completedSignUp = (email, password) => {
       };
 
 	let userPool = new CognitoUserPool(cognito);
-	userPool.signUp(email, password, [], null, (err, data) => {
-		if (err) {
-			console.log(err);
-		}
-		else
-		{
-			console.log(data);
-		}
-	});
+	
+	return new Promise((res, rej) => {
+		userPool.signUp(email, password, [], null, (err, data) => {
+
+		var messageResult = [];
+	
+			if (err) {
+				messageResult.push({signUp: 'failed', message: err.message});
+				res(messageResult);
+			}
+			else
+			{
+				messageResult.push({signUp: 'passed', message: data});
+				res(messageResult);
+			}
+		});
+	})
 };
 
 },{"../config":2,"amazon-cognito-identity-js":21}],2:[function(require,module,exports){

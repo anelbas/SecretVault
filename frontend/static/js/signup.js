@@ -81,9 +81,31 @@ function validateSignup(){
 	passwordStrengthText.style.visibility="hidden";
 
 	console.log(email, password)
-	completedSignUp.completedSignUp(email, password);
+	var signUpSuccessful;
 
+	completedSignUp.completedSignUp(email, password).then((res) => {
+		try {
+			if (res[0].signUp == 'passed')
+			{
+				swal({title: "Great!",
+				text: "Look out for a verification email - you can't log in unless you've verified :)!",
+				icon: "success",
+				button: true}).then((value) => {
+					window.location.href = "/login"
+				  });
+			}
+			else
+			{
+				swal("Oh no :(!", res[0].message, "error")
+			}
+		} catch (error) {
+			console.log("error");
+		}
+	
+	});
+	
 };
+
 
 //Password strength ratings from zxcvbn
 const strength = {
