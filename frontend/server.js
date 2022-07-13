@@ -34,12 +34,12 @@ app.use((req, res, next) => {
       return res.sendFile(path.resolve(__dirname, "static/templates/login.html"));
     }
 
-    if(req.originalUrl === '/signup') {
+    if(req.originalUrl === '/signUp') {
 
       return res.sendFile(path.resolve(__dirname, "static/templates/signup.html"));
     }
 
-    return res.redirect('/login');
+    return res.sendFile(path.resolve(__dirname, "public/index.html"));
   }
 
   next();
