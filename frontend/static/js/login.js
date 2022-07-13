@@ -9,3 +9,7 @@ function authenticateLogin(){
     completedSignIn.completedSignIn(email,password);
 
 };
+
+function goBack(){
+    window.location.href = "/";
+}

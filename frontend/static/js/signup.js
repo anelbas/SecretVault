@@ -136,3 +136,7 @@ password.addEventListener('input', function() {
 	}
 });
 
+function goBack(){
+    window.location.href = "/";
+}
+
