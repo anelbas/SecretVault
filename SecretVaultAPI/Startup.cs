@@ -68,6 +68,7 @@ options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -93,11 +94,11 @@ options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
         private TokenValidationParameters GetCognitoTokenValidationParams()
         {
-            var cognitoIssuer = $"https://cognito-idp.eu-west-1.amazonaws.com/eu-west-1_wdlu0N2r0";
+            string appClientId = this.Configuration.GetSection("UserPool")["AppClientId"];
+            string jwtKeySetUrl = this.Configuration.GetSection("UserPool")["UserPoolAuth"];
+            var cognitoIssuer = this.Configuration.GetSection("UserPool")["cognitoIssuer"];
 
-            var jwtKeySetUrl = $"{cognitoIssuer}/.well-known/jwks.json";
-
-            var cognitoAudience = "3tdd1ci4gkbcel377hjn62am0c";
+            var cognitoAudience = appClientId;
 
             return new TokenValidationParameters
             {
