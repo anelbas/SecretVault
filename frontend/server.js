@@ -4,7 +4,6 @@ const http = require('http');
 const app = express();
 const server = http.createServer(app);
 const { PORT } = require("./config");
-const exp = require("constants");
 
 app.use("/static", express.static(path.resolve(__dirname, "static")));
 
@@ -23,6 +22,28 @@ app.use('/cookiebundle.js', express.static("/static/js/cookiebundle.js"))
 app.use('/usernameBundle.js', express.static("/static/js/usernameBundle.js"))
 
 app.use('/amazon-cognito-identity.min.js', express.static('amazon-cognito-identity.min.js'));
+
+app.use((req, res, next) => {
+  
+  let accessTokenFromClient = req.rawHeaders?.[req.rawHeaders.indexOf('Cookie') + 1];
+
+  if (req.rawHeaders.indexOf('Cookie') === -1 || !accessTokenFromClient) {
+
+    if(req.originalUrl === '/login') {
+
+      return res.sendFile(path.resolve(__dirname, "static/templates/login.html"));
+    }
+
+    if(req.originalUrl === '/signup') {
+
+      return res.sendFile(path.resolve(__dirname, "static/templates/signup.html"));
+    }
+
+    return res.redirect('/login');
+  }
+
+  next();
+});
 
 app.get("/", (req, res) => {
   res.sendFile(path.resolve(__dirname, "public/index.html"));
