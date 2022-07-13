@@ -4,8 +4,10 @@
         <title>Secret Vault</title>
         <meta charset="UTF-8" />
         <link rel="stylesheet" href="../static/css/login.css" />
-        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-        <!-- <script src="../static/js/index.js"></script> -->   
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/@zxcvbn-ts/core@2.0.0/dist/zxcvbn-ts.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@zxcvbn-ts/language-common@2.0.0/dist/zxcvbn-ts.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@zxcvbn-ts/language-en@2.0.0/dist/zxcvbn-ts.js"></script>
     </head>
     <header>
         <h2 id="title">SECRET VAULT</h2>
@@ -13,14 +15,15 @@
     <body>
         <img id="lockimage" src="../static/images/lock.png"/>
         <section>
-            <input type="text" id="email" placeholder="Email">
+            <input type="text" id="email" placeholder="Email Address">
             <input type="password" id="password" placeholder="Password">
             <button  id="login" onclick="authenticateLogin()">Login</button>
         </section> 
     <footer></footer>
     </body>
     <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1173.0.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script type="module" src="../../userpool.js"></script>
     <script src="../../bundle.js"></script>
     <script src="../static/js/login.js"></script>
-    </html>
+</html>
