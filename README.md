@@ -9,7 +9,8 @@ Create a platform where a user can create, edit and delete secrets that they wan
 - In the terminal you will get a message saying on which port it is running
 - Navigate to that port to see the front-end locally (localhost:portNumber)
 
-- To see the hosted front-end go to: https://ec2-13-246-58-156.af-south-1.compute.amazonaws.com/
+- To see the hosted front-end go to: http://ec2-13-246-58-156.af-south-1.compute.amazonaws.com:3003/
+- PLEASE NOTE: At the moment the front-end is connected to the local api because it is more secure so the above link will not work. Please test it while running everything locally. Don't try to test the hosted stuff, thank you!
 - Extra documentation for the front-end can be found in github
 
 # SETTING UP THE BACK-END:
