@@ -26,7 +26,6 @@ namespace SecretVaultAPI.Controllers
 
         private string key = "b14ca9275a4e412a572e2ea2315e3516";
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [EnableCors("PostsPolicy")]
         [HttpGet]
         public IActionResult DetailsForAllPublicPosts()
@@ -54,7 +53,6 @@ namespace SecretVaultAPI.Controllers
             return Ok(postsDTO);
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [EnableCors("PostsPolicy")]
         [HttpGet("user")]
         public IActionResult DetailsForAllUserPosts(string userId)
@@ -93,7 +91,6 @@ namespace SecretVaultAPI.Controllers
             return Ok(postsDTO);
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [EnableCors("PostsPolicy")]
         [HttpGet("user/search")]
         public IActionResult SearchPostTitle(string userId, string title)
@@ -175,7 +172,6 @@ namespace SecretVaultAPI.Controllers
             return Ok(_responseAdapter.asDetailPostDTO(postToReturn));
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [EnableCors("PostsPolicy")]
         [HttpPost]
         public IActionResult Create([FromBody] PostDTO request)
@@ -231,7 +227,6 @@ namespace SecretVaultAPI.Controllers
             return Ok(_responseAdapter.asDTO(newPost));
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [EnableCors("PostsPolicy")]
         [HttpPut]
         public IActionResult EditPut(int? id, [FromBody] PostDTO request)
@@ -293,7 +288,6 @@ namespace SecretVaultAPI.Controllers
             return Ok(_responseAdapter.asDTO(newPost));
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [EnableCors("PostsPolicy")]
         [HttpPatch]
         public IActionResult EditPatch(int? id, [FromBody] PostDTO request)
@@ -351,7 +345,6 @@ namespace SecretVaultAPI.Controllers
             return Ok(_responseAdapter.asDTO(postToEdit));
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [EnableCors("PostsPolicy")]
         [HttpDelete]
         public IActionResult Delete(int? id)
