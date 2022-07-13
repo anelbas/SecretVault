@@ -91,11 +91,11 @@ options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
         private TokenValidationParameters GetCognitoTokenValidationParams()
         {
-            var cognitoIssuer = $"https://cognito-idp.eu-west-1.amazonaws.com/eu-west-1_wdlu0N2r0";
+            var cognitoIssuer = $"https://cognito-idp.eu-west-1.amazonaws.com/eu-west-1_eYPZ6wtks";
 
             var jwtKeySetUrl = $"{cognitoIssuer}/.well-known/jwks.json";
 
-            var cognitoAudience = "3tdd1ci4gkbcel377hjn62am0c";
+            var cognitoAudience = "4apfe9mjbkqm6jd1lvbfhipfs8";
 
             return new TokenValidationParameters
             {

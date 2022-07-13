@@ -1,4 +1,5 @@
-import mySecrets from './mock_data/secrets-mock.js';
+const token = getCookie.getCookie();
+const username = getUsername.getUsername();
 
 const privacyObject = {
   on: "Private",
@@ -11,7 +12,12 @@ const getMySecrets = async (userID) => {
 
   return await axios({
     method: "GET",
-    url: `https://localhost:5001/v1/Posts/user/${userID}`
+    url: `https://localhost:63153/v1/Posts/user/${userID}`,
+    headers: {
+      "Accept": "application/json",
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+  }
   }).then((res) => {
     console.log(res.data);
     return res.data
@@ -66,7 +72,7 @@ const createSecretCard = (id, text, privacy, userID) => {
     console.log(privacyToggle.value);
     axios({
       method: "PUT",
-      url: `https://localhost:5001/v1/Posts/${id}`,
+      url: `https://localhost:63153/v1/Posts/${id}`,
       data: {
         title: text,
         content: text,
@@ -117,7 +123,7 @@ function createNewSecret(userID) {
 
   axios({
     method: "POST",
-    url: `https://localhost:5001/v1/Posts`,
+    url: `https://localhost:63153/v1/Posts`,
     data: {
       title: secret.value,
       content: secret.value,
@@ -157,4 +163,4 @@ window.onload = (event) => {
   });
 };
 
-document.getElementById("my-secrets").onload = createSecretsTable(1);
+document.getElementById("my-secrets").onload = createSecretsTable(username);

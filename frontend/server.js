@@ -4,7 +4,8 @@ const http = require('http');
 const app = express();
 const server = http.createServer(app);
 const { PORT } = require("./config");
-const CognitoExpress = require('cognito-express');
+const CognitoExpress =require('cognito-express');
+const exp = require("constants");
 
 const authorisedRoute = express.Router();
 
@@ -17,13 +18,19 @@ const cognitoExpress = new CognitoExpress({
 
 app.use("/static", express.static(path.resolve(__dirname, "static")));
 
-app.use("/bundle.js", express.static("bundle.js"))
+app.use("/signInBundle.js", express.static("static/js/signInBundle.js"))
+
+app.use("/signUpBundle.js", express.static("static/js/signUpBundle.js"))
 
 app.use('/favicon.ico', express.static('static/images/friender.ico'));
 
 app.use('/config.js', express.static('config.js'));
 
 app.use('/userpool.js', express.static("userpool.js"));
+
+app.use('/cookiebundle.js', express.static("/static/js/cookiebundle.js"))
+
+app.use('/usernameBundle.js', express.static("/static/js/usernameBundle.js"))
 
 app.use('/amazon-cognito-identity.min.js', express.static('amazon-cognito-identity.min.js'));
 
@@ -89,6 +96,15 @@ app.get("/login", (req, res) => {
 app.get("/signup", (req, res) => {
   res.sendFile(path.resolve(__dirname, "static/templates/signup.html"));
 });
+
+app.get("/mySecrets", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "static/templates/mySecrets.html"));
+  });
+  
+  app.get("/newSecret", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "static/templates/newSecret.html"));
+  });
+  
 
 
 app.use(function (req, res) {
