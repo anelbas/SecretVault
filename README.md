@@ -23,7 +23,7 @@ Create a platform where a user can create, edit and delete secrets that they wan
 		- Open a new terminal
 		- Make sure the path is pointing to the SecretVaultAPI folder
 		- Type "dotnet run"
-		- Go to "https://localhost:5001/swagger/index.html" to view the API)
+		- Go to "https://localhost:portNumberSpecifiedInTerminal/swagger/index.html" to view the API)
 		- At the moment you won't be able to run the endpoints from swagger because you need to use a token. You will need to use postman to test endpoints because swagger does not account for authentication.
 
 ## Rundown of API endpoints:
@@ -36,7 +36,7 @@ Create a platform where a user can create, edit and delete secrets that they wan
 - GET /v1/Post/user/search : Get all user posts containing a certain string in the title
 - GET /v1/Post/details : Get the details of a certain post
 
-# Technologies uses:
+# AWS Technologies uses:
 - Database hosted on CloudFormation instance
 - API hosted on API Gateway instance
 - Front-end hosted on EC2 instance
