@@ -12,7 +12,7 @@ const getMySecrets = async (userID) => {
 
   return await axios({
     method: "GET",
-    url: `https://localhost:63153/v1/Posts/user?userId=${userID}`,
+    url: `https://localhost:44391/v1/Posts/user?userId=${userID}`,
     headers: {
       "Accept": "application/json",
       "Content-Type": "application/json",
@@ -20,10 +20,8 @@ const getMySecrets = async (userID) => {
       "Access-Control-Allow-Origin": "*"
   }
   }).then((res) => {
-    console.log(res.data);
     return res.data;
   }).catch((err) => {
-    console.log("Unable to get your secrets", err);
     return [];
   });
 };
@@ -88,7 +86,7 @@ const createSecretCard = (id, title, text, privacy, userID) => {
     
     axios({
       method: "PUT",
-      url: `https://localhost:63153/v1/Posts?id=${id}`,
+      url: `https://localhost:44391/v1/Posts?id=${id}`,
       headers: {
         "Accept": "application/json",
         "Content-Type": "application/json",
@@ -96,9 +94,9 @@ const createSecretCard = (id, title, text, privacy, userID) => {
         "Access-Control-Allow-Origin": "*"
     },
       data: {
-        title: text,
+        title: title,
         content: text,
-        timestamp: "2022-07-12T01:22:12.8576588+02:00",
+        timestamp: new Date().toISOString(),
         privacyStatus: privacyObject[privacy === "Private" ? 'off' : 'on'],
         userId: userID
       },
@@ -108,10 +106,8 @@ const createSecretCard = (id, title, text, privacy, userID) => {
         "Authorization": `Bearer ${token}`
       }
     }).then((res) => {
-      console.log(res.data);
       return res.data
     }).catch((err) => {
-      console.log("Unable to get your secrets", err);
       return [];
     });
   }
@@ -150,7 +146,7 @@ function createNewSecret(userID) {
 
   axios({
     method: "POST",
-    url: `https://localhost:63153/v1/Posts`,
+    url: `https://localhost:44391/v1/Posts`,
     headers: {
       "Accept": "application/json",
       "Content-Type": "application/json",
@@ -170,10 +166,10 @@ function createNewSecret(userID) {
       "Authorization": `Bearer ${token}`
     }
   }).then((res) => {
-    const posts = res.data
     window.location.reload();
   }).catch((err) => {
-    console.log("Server error", err);
+    console.error(err);
+    alert("We didn't catch that, could you tell us again");
   });
 
   section.style.display = "none";

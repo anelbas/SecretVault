@@ -54,7 +54,7 @@ function getAllPosts() {
     let token = getCookie.getCookie();
     axios({
         method: "GET",
-        url: "https://localhost:63153/v1/Posts",
+        url: "https://localhost:44391/v1/Posts",
         headers: {
             "Accept": "application/json",
             "Content-Type": "application/json",
@@ -63,8 +63,8 @@ function getAllPosts() {
     }).then((res) => {
         posts = res.data
         allPosts(posts)
-    }).catch((err) => {
-        console.log("help", err);
+    }).catch(() => {
+        alert("I can't remember your secrets, please jog my mind (refresh)");
     })
 }
 

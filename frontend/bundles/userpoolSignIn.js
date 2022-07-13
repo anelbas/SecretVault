@@ -27,7 +27,6 @@ module.exports.completedSignIn = (email,password)=>{
 			let accessToken = result.getIdToken().getJwtToken();
 	
 			//POTENTIAL: Region needs to be set if not already set previously elsewhere.
-			console.log(AWS);
 			AWS.config.region = 'eu-west-1';
 	
 			AWS.config.credentials = new AWS.CognitoIdentityCredentials({
@@ -45,7 +44,6 @@ module.exports.completedSignIn = (email,password)=>{
 				if (error) {
 					console.error(error);
 				} else {
-					console.log(result);
 					const cookie = new Cookies();
 					cookie.set('token', accessToken, {expires: new Date(new Date().getTime() + 1*60*60*1000), HttpOnly: true, path:"/"})
 					cookie.set('username', result.getIdToken().payload['cognito:username'], {expires: new Date(new Date().getTime() + 1*60*60*1000), HttpOnly: true, path:"/"});
