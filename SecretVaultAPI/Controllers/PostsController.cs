@@ -24,7 +24,7 @@ namespace SecretVaultAPI.Controllers
         public ResponseAdapter _responseAdapter = new ResponseAdapter();
         public AuthUtil _authUtil = new AuthUtil();
 
-        private string key = "b14ca9275a4e412a572e2ea2315e3516";  
+        private string key = "b14ca9275a4e412a572e2ea2315e3516";
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [EnableCors("PostsPolicy")]
@@ -58,39 +58,73 @@ namespace SecretVaultAPI.Controllers
         [EnableCors("PostsPolicy")]
         [HttpGet("user")]
         public IActionResult DetailsForAllUserPosts(string userId)
+
         {
 
+
+
             if (string.IsNullOrEmpty(userId))
+
             {
+
                 return BadRequest("Please provide a user id");
+
             }
+
+
 
             var authToken = _authUtil.decodeJWT(Request.Headers["Authorization"]);
 
+
+
             if (!_authUtil.isUser(authToken, userId))
+
             {
+
                 return Unauthorized("You do not have permission to access this data");
+
             }
+
+
 
             List<Post> posts = _context.Posts.Where(item => item.UserId == userId).ToList();
+
             if (posts.Count == 0)
+
             {
+
                 return Ok("No posts found for user");
+
             }
+
             posts.ForEach(post => post.Content = _encodingUtil.DecryptString(key, post.Content));
 
-            List<PostDTO> postsDTO = new List<PostDTO>();
+
+
+            List<DetailPostDTO> detailPostsDTO = new List<DetailPostDTO>();
+
+
 
             try
+
             {
-                posts.ForEach(post => postsDTO.Add(_responseAdapter.asDTO(post)));
-            }
-            catch
-            {
-                return StatusCode(500, "Unable to fetch posts from database.");
+
+                posts.ForEach(post => detailPostsDTO.Add(_responseAdapter.asDetailPostDTO(post)));
+
             }
 
-            return Ok(postsDTO);
+            catch
+
+            {
+
+                return StatusCode(500, "Unable to fetch posts from database.");
+
+            }
+
+
+
+            return Ok(detailPostsDTO);
+
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
