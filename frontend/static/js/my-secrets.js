@@ -83,7 +83,6 @@ const createSecretCard = (id, title, text, privacy, userID) => {
   privacySlider.className = "slider round";
   privacySlider.id = "privacy-toggle";
   privacySlider.onclick = () => {
-    
     axios({
       method: "PUT",
       url: `https://localhost:44391/v1/Posts?id=${id}`,

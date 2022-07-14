@@ -1,8 +1,48 @@
 
 
+
 let posts = [];
 let postsTitles = [];
 let currentTab;
+let mySecrets = [];
+
+let userID = getUsername.getUsername();
+let token = getCookie.getCookie();
+
+function allPrivatePosts(currentPosts)
+{
+    if (currentPosts.length < 1)
+    {
+        let noPosts = document.createElement("h1");
+        noPosts.innerText = "No posts to show!"
+        currentTab.appendChild(noPosts);
+    }
+    else {
+        currentPosts.forEach(currentPost => {
+            if (currentPost.privacyStatus === "Public")
+             currentTab = document.getElementById("tab-content-public")
+            else
+             currentTab = document.getElementById("tab-content-private");
+
+            let secretsDiv = document.createElement("div");
+            secretsDiv.className = "secrets";
+            currentTab.appendChild(secretsDiv);
+            let timestamp = document.createElement("p");
+            timestamp.className = "timestamp";
+            let formattedTimeStamp = formatTimeStamp(currentPost.timestamp)
+            timestamp.innerText = formattedTimeStamp;
+            secretsDiv.appendChild(timestamp);
+            let titlePost = document.createElement("h4");
+            titlePost.className = "titlePost";
+            titlePost.innerHTML = `${currentPost.title}`;
+            secretsDiv.appendChild(titlePost);
+            let post = document.createElement("p");
+            post.className = "post";
+            post.innerText = `${currentPost.content}`;
+            secretsDiv.appendChild(post);
+        });
+    }
+}
 
 
 function allPosts(currentPosts){
@@ -51,7 +91,6 @@ function formatTimeStamp(timeStamp) {
 }
 
 function getAllPosts() {
-    let token = getCookie.getCookie();
     axios({
         method: "GET",
         url: "https://localhost:44391/v1/Posts",
@@ -66,6 +105,25 @@ function getAllPosts() {
     }).catch(() => {
         alert("I can't remember your secrets, please jog my mind (refresh)");
     })
+}
+
+function myPrivateSecrets(userID){
+    axios({
+        method: "GET",
+        url: `https://localhost:44391/v1/Posts/user?userId=${userID}`,
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+          "Access-Control-Allow-Origin": "*"
+      }
+      }).then((res) => {
+        mySecrets = res.data;
+        allPrivatePosts(mySecrets);
+      }).catch((err) => {
+        console.log("Unable to get your secrets", err);
+        return [];
+      });
 }
 
 function searchPostsPrivate(){
@@ -124,4 +182,5 @@ function clearTab(){
 
 window.onload = (event) => {
     getAllPosts();
+    myPrivateSecrets(userID)
   };
