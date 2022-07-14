@@ -1,5 +1,5 @@
 
-console.log("heyy")
+// console.log("heyy")
 
 const token = getCookie.getCookie();
 const username = getUsername.getUsername();
@@ -39,7 +39,7 @@ const createSecretsTable = async (userID) => {
   {
     for (let i = 0; i < secrets.length; i++) {
 
-      console.table('secret', secrets[i]);
+      // console.table('secret', secrets[i]);
   
       const id = secrets[i].postId;
       const text = secrets[i].content;
@@ -130,9 +130,9 @@ function createNewSecret(userID) {
     return;
   }
 
-  console.log("secret", secret.value);
-  console.log("privacy", privacyStatus.value);
-  console.log(new Date().toUTCString());
+  // console.log("secret", secret.value);
+  // console.log("privacy", privacyStatus.value);
+  // console.log(new Date().toUTCString());
 
   axios({
     method: "POST",

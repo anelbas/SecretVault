@@ -28,7 +28,7 @@ module.exports.completedSignIn = (email,password)=>{
                 let accessToken = result.getIdToken().getJwtToken();
         
                 //POTENTIAL: Region needs to be set if not already set previously elsewhere.
-                console.log(AWS);
+                // console.log(AWS);
                 AWS.config.region = 'eu-west-1';
         
                 AWS.config.credentials = new AWS.CognitoIdentityCredentials({

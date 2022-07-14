@@ -1,4 +1,6 @@
-//Options for password strength checker
+/**
+ * Settings for password strength checker
+ */
 const options = {
     translations: zxcvbnts['language-en'].translations,
     graphs: zxcvbnts['language-common'].adjacencyGraphs,
@@ -7,9 +9,19 @@ const options = {
       ...zxcvbnts['language-en'].dictionary,
     },
 }
-  
+
+/**
+ * Apply settings for password strength checker
+ */
 zxcvbnts.core.zxcvbnOptions.setOptions(options);
 
+/**
+ * Displays a toast alert on the webpage
+ * @function makeToast
+ * @param {string} alertText - The text that goes inside the alert
+ * @param {number} alertX - The x-value for the alert
+ * @param {number} alertY - The y-value for the alert
+ */
 function makeToast(alertText,alertX,alertY){
 	Toastify({
 		text: alertText,
@@ -28,19 +40,24 @@ function makeToast(alertText,alertX,alertY){
 	}).showToast();
 }
 
+/**
+ * Performs input validation on email and password inputs
+ * @function validateLogin
+ * @returns {boolean} Based on if the input is valid or not
+ */
 function validateLogin(){
     const email=document.getElementById("email").value;
     const password=document.getElementById("password").value;
     
     const validEmailRegEx=/^[a-zA-Z0-9_+&*-]+(?:\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,7}$/;
 
-    const isEmailValid=validEmailRegEx.test(email);
-	const isPasswordValid=password.length>0;
+    const isEmailValid=validEmailRegEx.test(email); // Make sure email address is somewhat ok
+	const isPasswordValid=password.length>0; // Make sure password isn't empty
 
     if(!isEmailValid){
 		const xCoordRef=document.querySelector('#email').getBoundingClientRect().left // X
 		const yCoordRef=document.querySelector('#email').getBoundingClientRect().top // Y
-		const xCoordOffset=330;
+		const xCoordOffset=330; // Hardcoding styling :)
 		const yCoordOffset=22;
 
 		const alertText="Please enter a valid email address";
@@ -53,7 +70,7 @@ function validateLogin(){
     if(!isPasswordValid){
         const xCoordRef=document.querySelector('#password').getBoundingClientRect().left // X
 		const yCoordRef=document.querySelector('#password').getBoundingClientRect().top // Y
-		const xCoordOffset=260;
+		const xCoordOffset=260; // Hardcoding styling :)
 		const yCoordOffset=22;
 
 		const alertText="Please enter a password";
@@ -66,11 +83,16 @@ function validateLogin(){
     return true;
 }
 
+/**
+ * Performs authentication on email and password inputs
+ * @function authenticateLogin
+ */
 function authenticateLogin(){
 
     const email=document.getElementById("email").value;
     const password=document.getElementById("password").value;
 
+    //Check for valid inputs
     if(!validateLogin()){
         return;
     }

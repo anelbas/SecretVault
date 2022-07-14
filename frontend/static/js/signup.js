@@ -1,4 +1,6 @@
-//Options for password strength checker
+/**
+ * Settings for password strength checker
+ */
 const options = {
     translations: zxcvbnts['language-en'].translations,
     graphs: zxcvbnts['language-common'].adjacencyGraphs,
@@ -7,13 +9,22 @@ const options = {
       ...zxcvbnts['language-en'].dictionary,
     },
 }
-  
+
+/**
+ * Apply settings for password strength checker
+ */
 zxcvbnts.core.zxcvbnOptions.setOptions(options);
 
 const meter = document.getElementById('password-strength-meter');
 const passwordStrengthText = document.getElementById('password-strength-text');
 
-  
+/**
+ * Displays a toast alert on the webpage
+ * @function makeToast
+ * @param {string} alertText - The text that goes inside the alert
+ * @param {number} alertX - The x-value for the alert
+ * @param {number} alertY - The y-value for the alert
+ */  
 function makeToast(alertText,alertX,alertY){
 	Toastify({
 		text: alertText,
@@ -32,13 +43,21 @@ function makeToast(alertText,alertX,alertY){
 	}).showToast();
 }
 
+/**
+ * Checks to see if password is strong using zxcvbn
+ * @function isPasswordStrong
+ */
 function isPasswordStrong(){
 	passwordValue = password.value;
 	result = zxcvbnts.core.zxcvbn(passwordValue);//use zxcvbn to obtain info on password strength
 
 	return result.score==4 ? true : false; 	
 }
-  
+
+/**
+ * Performs input validation on email and password inputs
+ * @function validateSignup
+ */
 function validateSignup(){
 
 	const email=document.getElementById("email").value; 
@@ -47,8 +66,8 @@ function validateSignup(){
 	const validEmailRegEx=/^[a-zA-Z0-9_+&*-]+(?:\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,7}$/;
 
 
-	const isEmailValid=validEmailRegEx.test(email);
-	const isPasswordValid=isPasswordStrong();
+	const isEmailValid=validEmailRegEx.test(email);// Make sure email address is somewhat ok
+	const isPasswordValid=isPasswordStrong();// Make sure password isn't empty
 
 	if(!isEmailValid){
 		const xCoordRef=document.querySelector('#email').getBoundingClientRect().left // X
@@ -80,9 +99,9 @@ function validateSignup(){
 	meter.style.visibility="hidden";
 	passwordStrengthText.style.visibility="hidden";
 
-	console.log(email, password)
 	var signUpSuccessful;
 
+	//Initiate signup with AWS
 	completedSignUp.completedSignUp(email, password).then((res) => {
 		try {
 			if (res[0].signUp == 'passed')
@@ -118,7 +137,8 @@ const strength = {
 
 let passwordValue="";
 let result="";
-	
+
+//Checks password strength when typing a password
 password.addEventListener('input', function() {
 	meter.style.visibility="visible";
 	passwordStrengthText.style.visibility="visible";
