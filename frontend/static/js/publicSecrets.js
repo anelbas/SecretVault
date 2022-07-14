@@ -102,8 +102,8 @@ function getAllPosts() {
     }).then((res) => {
         posts = res.data
         allPosts(posts)
-    }).catch((err) => {
-        console.log("help", err);
+    }).catch(() => {
+        alert("I can't remember your secrets, please jog my mind (refresh)");
     })
 }
 

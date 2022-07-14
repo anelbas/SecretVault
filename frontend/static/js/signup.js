@@ -80,8 +80,7 @@ function validateSignup(){
 	meter.style.visibility="hidden";
 	passwordStrengthText.style.visibility="hidden";
 
-	console.log(email, password)
-	var signUpSuccessful;
+	console.log(email, password);
 
 	completedSignUp.completedSignUp(email, password).then((res) => {
 		try {

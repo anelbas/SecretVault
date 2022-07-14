@@ -1,6 +1,3 @@
-
-console.log("heyy")
-
 const token = getCookie.getCookie();
 const username = getUsername.getUsername();
 
@@ -23,10 +20,8 @@ const getMySecrets = async (userID) => {
       "Access-Control-Allow-Origin": "*"
   }
   }).then((res) => {
-    console.log(res.data);
     return res.data;
   }).catch((err) => {
-    console.log("Unable to get your secrets", err);
     return [];
   });
 };
@@ -35,26 +30,39 @@ const createSecretsTable = async (userID) => {
 
   const secrets = await getMySecrets(userID);
 
-  if (Array.isArray(secrets))
-  {
-    for (let i = 0; i < secrets.length; i++) {
+  if(!Array.isArray(secrets)) {
+    const errorCard = document.getElementById('secrets-error');
+    const error = document.createElement("h1");
+    const message = document.createTextNode("Don't bottle everything up, Open up and tell us your secrets. We promise not to tell...");
+    error.appendChild(message);
+    errorCard.appendChild(error);
+    errorCard.style.display = 'block';
+    return;
+  }
 
-      console.table('secret', secrets[i]);
-  
-      const id = secrets[i].postId;
-      const text = secrets[i].content;
-      const privacy = secrets[i].privacyStatus;
-  
-      createSecretCard(id, text, privacy, userID);
-    }
+  for (let i = 0; i < secrets.length; i++) {
+
+    console.table('secret', secrets[i]);
+
+    const id = secrets[i].postId;
+    const title = secrets[i].title;
+    const text = secrets[i].content;
+    const privacy = secrets[i].privacyStatus;
+
+    createSecretCard(id, title, text, privacy, userID);
   }
 };
 
-const createSecretCard = (id, text, privacy, userID) => {
+const createSecretCard = (id, title, text, privacy, userID) => {
 
   const parent = document.getElementById("my-secrets");
   const card = document.createElement("article");
   card.className = "secrets grid-item"
+
+  const cardTitle = document.createElement("p");
+  cardTitle.className = 'textClass textTitle';
+  const titleText = document.createTextNode(title);
+  cardTitle.appendChild(titleText);
 
   const content = document.createElement("p");
   content.className = 'textClass';
@@ -73,6 +81,7 @@ const createSecretCard = (id, text, privacy, userID) => {
 
   const privacySlider = document.createElement("span");
   privacySlider.className = "slider round";
+  privacySlider.id = "privacy-toggle";
   privacySlider.onclick = () => {
     axios({
       method: "PUT",
@@ -84,7 +93,7 @@ const createSecretCard = (id, text, privacy, userID) => {
         "Access-Control-Allow-Origin": "*"
     },
       data: {
-        title: text,
+        title: title,
         content: text,
         timestamp: new Date().toISOString(),
         privacyStatus: privacyObject[privacy === "Private" ? 'off' : 'on'],
@@ -113,6 +122,7 @@ const createSecretCard = (id, text, privacy, userID) => {
   privacyStatus.appendChild(privacyToggle);
   privacyStatus.appendChild(privacyLabel);
 
+  card.appendChild(cardTitle);
   card.appendChild(content);
   card.appendChild(privacyStatus);
 
@@ -122,17 +132,16 @@ const createSecretCard = (id, text, privacy, userID) => {
 function createNewSecret(userID) {
 
   const section = document.getElementById('new-secrets-section');
+  const secretTitle = document.getElementById('new-secret-title');
   const secret = document.getElementById('new-secret-content');
   const privacyStatus = document.getElementById('new-secret-privacy');
 
-  if (section?.offsetParent === null || secret?.value === '' || secret?.value === null) {
-    console.log("abort");
+  if (
+    section?.offsetParent === null || secret?.value === '' || secret?.value === null
+    || secretTitle?.value === '' || secretTitle?.value === null
+  ) {
     return;
   }
-
-  console.log("secret", secret.value);
-  console.log("privacy", privacyStatus.value);
-  console.log(new Date().toUTCString());
 
   axios({
     method: "POST",
@@ -144,26 +153,28 @@ function createNewSecret(userID) {
       "Access-Control-Allow-Origin": "*"
   },
     data: {
-      title: secret.value,
+      title: secretTitle.value,
       content: secret.value,
-      timestamp: "2022-07-12T01:22:12.8576588+02:00",
+      timestamp: new Date().toISOString(),
       privacyStatus: privacyObject[privacyStatus.value],
       userId: userID
+    },
+    headers: {
+      "Accept": "application/json",
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
     }
   }).then((res) => {
-    const posts = res.data
+    window.location.reload();
   }).catch((err) => {
-    console.log("Server error", err);
+    console.error(err);
+    alert("We didn't catch that, could you tell us again");
   });
 
   section.style.display = "none";
   secret.value = null;
   privacyStatus.value = "on";
 }
-
-// function publicSecrets(){
-//   window.location.href = "/publicSecrets";
-// }
 
 window.onload = (event) => {
 
