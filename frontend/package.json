@@ -15,7 +15,7 @@
   "license": "ISC",
   "dependencies": {
     "amazon-cognito-identity-js": "^5.2.10",
-    "aws-sdk": "^2.1173.0",
+    "aws-sdk": "^2.1174.0",
     "axios": "^0.27.2",
     "bcrypt": "^5.0.1",
     "browserify": "^17.0.0",
