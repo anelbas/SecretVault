@@ -19,7 +19,7 @@
     "axios": "^0.27.2",
     "bcrypt": "^5.0.1",
     "browserify": "^17.0.0",
-    "cognito-express": "^3.0.1",
+    "cognito-express": "^3.0.2",
     "cors": "^2.8.5",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
