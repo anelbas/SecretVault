@@ -17,7 +17,7 @@
     "amazon-cognito-identity-js": "^5.2.10",
     "aws-sdk": "^2.1173.0",
     "axios": "^0.27.2",
-    "bcrypt": "^5.0.1",
+    "bcrypt": "^6.0.0",
     "browserify": "^17.0.0",
     "cognito-express": "^3.0.1",
     "cors": "^2.8.5",
